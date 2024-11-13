@@ -1,6 +1,8 @@
+import 'dart:convert';
+
 class RazgovorkoUser {
   final String id;
-  final String? email;
+  final String email;
   final String? phoneNumber;
   final String displayName;
   final String? avatarUrl;
@@ -10,40 +12,16 @@ class RazgovorkoUser {
   final DateTime updatedAt;
 
   RazgovorkoUser({
-    required this.id,
+    required this.email,
     required this.displayName,
     required this.lastSeen,
     required this.createdAt,
     required this.updatedAt,
-    this.email,
+    this.id = '', // ID should be handled by Supabase
     this.phoneNumber,
     this.status,
     this.avatarUrl,
   });
-
-  factory RazgovorkoUser.fromJson(Map<String, dynamic> json) => RazgovorkoUser(
-        id: json['id'],
-        email: json['email'],
-        phoneNumber: json['phone_number'],
-        displayName: json['display_name'],
-        avatarUrl: json['avatar_url'],
-        status: json['status'],
-        lastSeen: DateTime.parse(json['last_seen']),
-        createdAt: DateTime.parse(json['created_at']),
-        updatedAt: DateTime.parse(json['updated_at']),
-      );
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'email': email,
-        'phone_number': phoneNumber,
-        'display_name': displayName,
-        'avatar_url': avatarUrl,
-        'status': status,
-        'last_seen': lastSeen.toIso8601String(),
-        'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
-      };
 
   RazgovorkoUser copyWith({
     String? id,
@@ -67,6 +45,34 @@ class RazgovorkoUser {
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
+
+  Map<String, dynamic> toMap() => <String, dynamic>{
+        // 'id': id,
+        'email': email,
+        'phone_number': phoneNumber,
+        'display_name': displayName,
+        'avatar_url': avatarUrl,
+        'status': status,
+        'last_seen': lastSeen.toIso8601String(),
+        'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt.toIso8601String(),
+      };
+
+  factory RazgovorkoUser.fromMap(Map<String, dynamic> map) => RazgovorkoUser(
+        id: map['id'] as String,
+        email: map['email'] as String,
+        phoneNumber: map['phone_number'] != null ? map['phone_number'] as String : null,
+        displayName: map['display_name'] as String,
+        avatarUrl: map['avatar_url'] != null ? map['avatar_url'] as String : null,
+        status: map['status'] != null ? map['status'] as String : null,
+        lastSeen: DateTime.parse(map['last_seen']),
+        createdAt: DateTime.parse(map['created_at']),
+        updatedAt: DateTime.parse(map['updated_at']),
+      );
+
+  String toJson() => json.encode(toMap());
+
+  factory RazgovorkoUser.fromJson(String source) => RazgovorkoUser.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() =>

@@ -5,17 +5,17 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../models/user.dart';
 import '../../services/auth_service.dart';
 import '../../services/logger_service.dart';
-import '../../services/user_service.dart';
+import '../../services/users_table_service.dart';
 
 class LoginController implements Disposable {
   final LoggerService logger;
   final AuthService auth;
-  final UserService user;
+  final UsersTableService usersTable;
 
   LoginController({
     required this.logger,
     required this.auth,
-    required this.user,
+    required this.usersTable,
   });
 
   ///
@@ -79,7 +79,7 @@ class LoginController implements Disposable {
       final supabaseUser = authResponse?.user;
 
       if (supabaseUser != null) {
-        final razgovorkoUser = await user.storeUserDataInDatabase(
+        final razgovorkoUser = await usersTable.storeUserDataInDatabase(
           supabaseUser: supabaseUser,
         );
 

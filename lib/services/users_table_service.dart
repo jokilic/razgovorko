@@ -1,13 +1,15 @@
+// ignore_for_file: unnecessary_lambdas
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/user.dart';
 import 'logger_service.dart';
 import 'supabase_service.dart';
 
-class UserService {
+class UsersTableService {
   final LoggerService logger;
 
-  UserService({
+  UsersTableService({
     required this.logger,
   });
 
@@ -17,13 +19,18 @@ class UserService {
 
   /// Stores user data in `users` table
   Future<RazgovorkoUser?> storeUserDataInDatabase({required User supabaseUser}) async {
+    if (supabaseUser.email == null) {
+      logger.e('UsersTableService -> storeUserDataInDatabase() -> supabaseUser.email == null');
+      return null;
+    }
+
     try {
       final now = DateTime.now();
 
       /// Create new [RazgovorkoUser]
       final user = RazgovorkoUser(
         id: supabaseUser.id,
-        email: supabaseUser.email,
+        email: supabaseUser.email!,
         phoneNumber: supabaseUser.phone,
         displayName: 'My name new',
         status: 'Hello there',
@@ -36,10 +43,10 @@ class UserService {
       /// Insert into `users` table
       await supabase.from('users').upsert(user).select().single();
 
-      logger.t('UserService -> storeUserDataInDatabase() -> success!');
+      logger.t('UsersTableService -> storeUserDataInDatabase() -> success!');
       return user;
     } catch (e) {
-      logger.e('UserService -> storeUserDataInDatabase() -> $e');
+      logger.e('UsersTableService -> storeUserDataInDatabase() -> $e');
       return null;
     }
   }
@@ -71,10 +78,10 @@ class UserService {
         'updated_at': DateTime.now().toIso8601String(),
       }).eq('id', userId);
 
-      logger.t('UserService -> updateUserDataInDatabase() -> success!');
+      logger.t('UsersTableService -> updateUserDataInDatabase() -> success!');
       return true;
     } catch (e) {
-      logger.e('UserService -> updateUserDataInDatabase() -> $e');
+      logger.e('UsersTableService -> updateUserDataInDatabase() -> $e');
       return false;
     }
   }
@@ -93,8 +100,22 @@ class UserService {
           primaryKey: ['id'],
         )
         .eq('id', userId)
-        .map(
-          (data) => data.isNotEmpty ? RazgovorkoUser.fromJson(data.first) : null,
-        );
+        .map((data) => data.isNotEmpty ? RazgovorkoUser.fromMap(data.first) : null);
+  }
+
+  /// Stream all users except the current user
+  Stream<List<RazgovorkoUser>?> streamAllUsers() {
+    final userId = supabase.auth.currentUser?.id;
+
+    if (userId == null) {
+      return Stream.value(null);
+    }
+
+    return supabase
+        .from('users')
+        .stream(primaryKey: ['id'])
+        .neq('id', userId) // Exclude current user
+        .order('display_name') // Order by name
+        .map((data) => data.isNotEmpty ? data.map((json) => RazgovorkoUser.fromMap(json)).toList() : null);
   }
 }

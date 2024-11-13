@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../dependencies.dart';
+import '../../routing.dart';
 import '../../services/auth_service.dart';
 import '../../services/logger_service.dart';
-import '../../services/user_service.dart';
+import '../../services/users_table_service.dart';
 import 'chat_controller.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -20,7 +21,7 @@ class _ChatScreenState extends State<ChatScreen> {
       () => ChatController(
         logger: getIt.get<LoggerService>(),
         auth: getIt.get<AuthService>(),
-        user: getIt.get<UserService>(),
+        usersTable: getIt.get<UsersTableService>(),
       ),
     );
   }
@@ -38,33 +39,87 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                StreamBuilder(
-                  stream: controller.streamCurrentUser(),
-                  builder: (context, userSnapshot) => Text(
-                    userSnapshot.data?.email ?? 'No email',
+          padding: const EdgeInsets.symmetric(
+            horizontal: 40,
+            vertical: 24,
+          ),
+          child: Column(
+            children: [
+              StreamBuilder(
+                stream: controller.streamCurrentUser(),
+                builder: (context, userSnapshot) => Text(
+                  userSnapshot.data?.email ?? 'No email',
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: controller.signOut,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(
+                    double.infinity,
+                    48,
                   ),
                 ),
-                const SizedBox(height: 32),
-                ElevatedButton.icon(
-                  onPressed: controller.signOut,
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(
-                      double.infinity,
-                      48,
-                    ),
-                  ),
-                  label: Text('Sign out'.toUpperCase()),
-                  icon: const Icon(
-                    Icons.logout_rounded,
-                  ),
+                label: Text('Sign out'.toUpperCase()),
+                icon: const Icon(
+                  Icons.logout_rounded,
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 24),
+              Expanded(
+                child: StreamBuilder(
+                  stream: controller.streamAllUsers(),
+                  builder: (context, usersSnapshot) {
+                    ///
+                    /// LOADING
+                    ///
+                    if (usersSnapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
+                    ///
+                    /// ERROR
+                    ///
+                    if (usersSnapshot.hasError) {
+                      return Text(
+                        usersSnapshot.error.toString(),
+                      );
+                    }
+
+                    ///
+                    /// SUCCESS
+                    ///
+                    if (usersSnapshot.hasData) {
+                      final users = usersSnapshot.data;
+
+                      return ListView.builder(
+                        itemCount: users?.length ?? 0,
+                        physics: const BouncingScrollPhysics(),
+                        itemBuilder: (_, index) {
+                          final user = users![index];
+
+                          return ListTile(
+                            onTap: () => openConversation(
+                              context,
+                              otherUser: user,
+                            ),
+                            title: Text(user.displayName),
+                            subtitle: Text(user.email),
+                            leading: const Icon(Icons.person_rounded),
+                          );
+                        },
+                      );
+                    }
+
+                    return Text(
+                      usersSnapshot.error.toString(),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ),
       ),

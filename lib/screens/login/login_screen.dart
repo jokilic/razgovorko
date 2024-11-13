@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../dependencies.dart';
 import '../../services/auth_service.dart';
 import '../../services/logger_service.dart';
-import '../../services/user_service.dart';
+import '../../services/users_table_service.dart';
 import 'login_controller.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -20,7 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
       () => LoginController(
         logger: getIt.get<LoggerService>(),
         auth: getIt.get<AuthService>(),
-        user: getIt.get<UserService>(),
+        usersTable: getIt.get<UsersTableService>(),
       ),
     );
   }
@@ -71,6 +71,23 @@ class _LoginScreenState extends State<LoginScreen> {
                   label: Text('Login'.toUpperCase()),
                   icon: const Icon(
                     Icons.login_rounded,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                ElevatedButton.icon(
+                  onPressed: () => controller.signUpAndStoreUserInDatabase(
+                    email: controller.emailController.text.trim(),
+                    password: controller.passwordController.text.trim(),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(
+                      double.infinity,
+                      48,
+                    ),
+                  ),
+                  label: Text('Signup'.toUpperCase()),
+                  icon: const Icon(
+                    Icons.app_registration_rounded,
                   ),
                 ),
               ],

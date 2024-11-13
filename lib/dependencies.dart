@@ -1,9 +1,11 @@
 import 'package:get_it/get_it.dart';
 
 import 'services/auth_service.dart';
+import 'services/chats_table_service.dart';
 import 'services/logger_service.dart';
+import 'services/messages_table_service.dart';
 import 'services/supabase_service.dart';
-import 'services/user_service.dart';
+import 'services/users_table_service.dart';
 
 final getIt = GetIt.instance;
 
@@ -48,7 +50,19 @@ void initializeServices() => getIt
     dependsOn: [LoggerService],
   )
   ..registerSingletonAsync(
-    () async => UserService(
+    () async => UsersTableService(
+      logger: getIt.get<LoggerService>(),
+    ),
+    dependsOn: [LoggerService],
+  )
+  ..registerSingletonAsync(
+    () async => ChatsTableService(
+      logger: getIt.get<LoggerService>(),
+    ),
+    dependsOn: [LoggerService],
+  )
+  ..registerSingletonAsync(
+    () async => MessagesTableService(
       logger: getIt.get<LoggerService>(),
     ),
     dependsOn: [LoggerService],
