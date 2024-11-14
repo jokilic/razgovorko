@@ -34,7 +34,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         messagesTable: getIt.get<MessagesTableService>(),
       ),
       afterRegister: (controller) => controller.init(
-        otherUserId: widget.otherUser.id,
+        otherUserIds: [widget.otherUser.id],
       ),
     );
   }

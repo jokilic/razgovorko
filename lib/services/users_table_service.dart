@@ -32,16 +32,15 @@ class UsersTableService {
         id: supabaseUser.id,
         email: supabaseUser.email!,
         phoneNumber: supabaseUser.phone,
-        displayName: 'My name new',
-        status: 'Hello there',
-        createdAt: now,
-        updatedAt: now,
-        lastSeen: now,
+        displayName: 'User!',
         avatarUrl: 'https://faroutmagazine.co.uk/static/uploads/1/2022/12/How-Danny-DeVito-joined-Its-Always-Sunny-in-Philadelphia-1140x855.jpeg',
+        status: 'My status',
+        lastSeen: now,
+        createdAt: now,
       );
 
       /// Insert into `users` table
-      await supabase.from('users').upsert(user).select().single();
+      await supabase.from('users').upsert(user.toMap()).select().single();
 
       logger.t('UsersTableService -> storeUserDataInDatabase() -> success!');
       return user;

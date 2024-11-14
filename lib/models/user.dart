@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 class RazgovorkoUser {
   final String id;
   final String email;
@@ -9,15 +7,13 @@ class RazgovorkoUser {
   final String? status;
   final DateTime lastSeen;
   final DateTime createdAt;
-  final DateTime updatedAt;
 
   RazgovorkoUser({
+    required this.id,
     required this.email,
     required this.displayName,
     required this.lastSeen,
     required this.createdAt,
-    required this.updatedAt,
-    this.id = '', // ID should be handled by Supabase
     this.phoneNumber,
     this.status,
     this.avatarUrl,
@@ -43,11 +39,10 @@ class RazgovorkoUser {
         status: status ?? this.status,
         lastSeen: lastSeen ?? this.lastSeen,
         createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
       );
 
   Map<String, dynamic> toMap() => <String, dynamic>{
-        // 'id': id,
+        'id': id,
         'email': email,
         'phone_number': phoneNumber,
         'display_name': displayName,
@@ -55,7 +50,6 @@ class RazgovorkoUser {
         'status': status,
         'last_seen': lastSeen.toIso8601String(),
         'created_at': createdAt.toIso8601String(),
-        'updated_at': updatedAt.toIso8601String(),
       };
 
   factory RazgovorkoUser.fromMap(Map<String, dynamic> map) => RazgovorkoUser(
@@ -67,16 +61,11 @@ class RazgovorkoUser {
         status: map['status'] != null ? map['status'] as String : null,
         lastSeen: DateTime.parse(map['last_seen']),
         createdAt: DateTime.parse(map['created_at']),
-        updatedAt: DateTime.parse(map['updated_at']),
       );
-
-  String toJson() => json.encode(toMap());
-
-  factory RazgovorkoUser.fromJson(String source) => RazgovorkoUser.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() =>
-      'RazgovorkoUser(id: $id, email: $email, phoneNumber: $phoneNumber, displayName: $displayName, avatarUrl: $avatarUrl, status: $status, lastSeen: $lastSeen, createdAt: $createdAt, updatedAt: $updatedAt)';
+      'RazgovorkoUser(id: $id, email: $email, phoneNumber: $phoneNumber, displayName: $displayName, avatarUrl: $avatarUrl, status: $status, lastSeen: $lastSeen, createdAt: $createdAt)';
 
   @override
   bool operator ==(covariant RazgovorkoUser other) {
@@ -91,19 +80,9 @@ class RazgovorkoUser {
         other.avatarUrl == avatarUrl &&
         other.status == status &&
         other.lastSeen == lastSeen &&
-        other.createdAt == createdAt &&
-        other.updatedAt == updatedAt;
+        other.createdAt == createdAt;
   }
 
   @override
-  int get hashCode =>
-      id.hashCode ^
-      email.hashCode ^
-      phoneNumber.hashCode ^
-      displayName.hashCode ^
-      avatarUrl.hashCode ^
-      status.hashCode ^
-      lastSeen.hashCode ^
-      createdAt.hashCode ^
-      updatedAt.hashCode;
+  int get hashCode => id.hashCode ^ email.hashCode ^ phoneNumber.hashCode ^ displayName.hashCode ^ avatarUrl.hashCode ^ status.hashCode ^ lastSeen.hashCode ^ createdAt.hashCode;
 }

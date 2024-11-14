@@ -36,14 +36,15 @@ class MessagesTableService {
       final message = Message(
         chatId: chatId,
         senderId: userId,
-        messageType: 'text',
+        messageType: MessageType.text,
+        content: messageText,
         isViewOnce: false,
         isDeleted: false,
         createdAt: DateTime.now(),
       );
 
       /// Store in [Supabase]
-      await supabase.from('messages').insert(message);
+      await supabase.from('messages').insert(message.toMap());
 
       logger.t('MessagesTableService -> sendMessage() -> success!');
       return true;
