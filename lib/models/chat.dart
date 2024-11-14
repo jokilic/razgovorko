@@ -12,7 +12,6 @@ class Chat {
   final String? description;
   final String? avatarUrl;
   final String? lastMessageId;
-  final DateTime? lastMessageAt;
   final DateTime createdAt;
   final String createdBy;
   final DateTime? deletedAt;
@@ -29,7 +28,6 @@ class Chat {
     this.description,
     this.avatarUrl,
     this.lastMessageId,
-    this.lastMessageAt,
     this.deletedAt,
     this.usersTyping,
   });
@@ -41,7 +39,6 @@ class Chat {
     String? description,
     String? avatarUrl,
     String? lastMessageId,
-    DateTime? lastMessageAt,
     DateTime? createdAt,
     String? createdBy,
     DateTime? deletedAt,
@@ -55,7 +52,6 @@ class Chat {
         description: description ?? this.description,
         avatarUrl: avatarUrl ?? this.avatarUrl,
         lastMessageId: lastMessageId ?? this.lastMessageId,
-        lastMessageAt: lastMessageAt ?? this.lastMessageAt,
         createdAt: createdAt ?? this.createdAt,
         createdBy: createdBy ?? this.createdBy,
         deletedAt: deletedAt ?? this.deletedAt,
@@ -70,7 +66,6 @@ class Chat {
         'description': description,
         'avatar_url': avatarUrl,
         'last_message_id': lastMessageId,
-        'last_message_at': lastMessageAt?.toIso8601String(),
         'created_at': createdAt.toIso8601String(),
         'created_by': createdBy,
         'deleted_at': deletedAt?.toIso8601String(),
@@ -85,7 +80,6 @@ class Chat {
         description: map['description'] != null ? map['description'] as String : null,
         avatarUrl: map['avatar_url'] != null ? map['avatar_url'] as String : null,
         lastMessageId: map['last_message_id'] != null ? map['last_message_id'] as String : null,
-        lastMessageAt: map['last_message_at'] != null ? DateTime.parse(map['last_message_at']) : null,
         createdAt: DateTime.parse(map['created_at']),
         createdBy: map['created_by'] as String,
         deletedAt: map['deleted_at'] != null ? DateTime.parse(map['deleted_at']) : null,
@@ -95,7 +89,7 @@ class Chat {
 
   @override
   String toString() =>
-      'Chat(id: $id, chatType: $chatType, name: $name, description: $description, avatarUrl: $avatarUrl, lastMessageId: $lastMessageId, lastMessageAt: $lastMessageAt, createdAt: $createdAt, createdBy: $createdBy, deletedAt: $deletedAt, participants: $participants, usersTyping: $usersTyping)';
+      'Chat(id: $id, chatType: $chatType, name: $name, description: $description, avatarUrl: $avatarUrl, lastMessageId: $lastMessageId, createdAt: $createdAt, createdBy: $createdBy, deletedAt: $deletedAt, participants: $participants, usersTyping: $usersTyping)';
 
   @override
   bool operator ==(covariant Chat other) {
@@ -109,7 +103,6 @@ class Chat {
         other.description == description &&
         other.avatarUrl == avatarUrl &&
         other.lastMessageId == lastMessageId &&
-        other.lastMessageAt == lastMessageAt &&
         other.createdAt == createdAt &&
         other.createdBy == createdBy &&
         other.deletedAt == deletedAt &&
@@ -125,7 +118,6 @@ class Chat {
       description.hashCode ^
       avatarUrl.hashCode ^
       lastMessageId.hashCode ^
-      lastMessageAt.hashCode ^
       createdAt.hashCode ^
       createdBy.hashCode ^
       deletedAt.hashCode ^
