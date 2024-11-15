@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 
 import 'services/auth_service.dart';
+import 'services/chat_user_status_table_service.dart';
 import 'services/chats_table_service.dart';
 import 'services/logger_service.dart';
 import 'services/messages_table_service.dart';
@@ -57,6 +58,12 @@ void initializeServices() => getIt
   )
   ..registerSingletonAsync(
     () async => ChatsTableService(
+      logger: getIt.get<LoggerService>(),
+    ),
+    dependsOn: [LoggerService],
+  )
+  ..registerSingletonAsync(
+    () async => ChatUserStatusTableService(
       logger: getIt.get<LoggerService>(),
     ),
     dependsOn: [LoggerService],

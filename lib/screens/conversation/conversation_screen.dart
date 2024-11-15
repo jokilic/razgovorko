@@ -4,6 +4,7 @@ import 'package:watch_it/watch_it.dart';
 import '../../dependencies.dart';
 import '../../models/user.dart';
 import '../../services/auth_service.dart';
+import '../../services/chat_user_status_table_service.dart';
 import '../../services/chats_table_service.dart';
 import '../../services/logger_service.dart';
 import '../../services/messages_table_service.dart';
@@ -31,6 +32,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         logger: getIt.get<LoggerService>(),
         auth: getIt.get<AuthService>(),
         chatsTable: getIt.get<ChatsTableService>(),
+        chatUserStatusTable: getIt.get<ChatUserStatusTableService>(),
         messagesTable: getIt.get<MessagesTableService>(),
       ),
       afterRegister: (controller) => controller.init(

@@ -16,7 +16,6 @@ class Chat {
   final String createdBy;
   final DateTime? deletedAt;
   final List<String> participants;
-  final List<String>? usersTyping;
 
   Chat({
     required this.chatType,
@@ -29,7 +28,6 @@ class Chat {
     this.avatarUrl,
     this.lastMessageId,
     this.deletedAt,
-    this.usersTyping,
   });
 
   Chat copyWith({
@@ -43,7 +41,6 @@ class Chat {
     String? createdBy,
     DateTime? deletedAt,
     List<String>? participants,
-    List<String>? usersTyping,
   }) =>
       Chat(
         id: id ?? this.id,
@@ -56,7 +53,6 @@ class Chat {
         createdBy: createdBy ?? this.createdBy,
         deletedAt: deletedAt ?? this.deletedAt,
         participants: participants ?? this.participants,
-        usersTyping: usersTyping ?? this.usersTyping,
       );
 
   Map<String, dynamic> toMap() => <String, dynamic>{
@@ -70,7 +66,6 @@ class Chat {
         'created_by': createdBy,
         'deleted_at': deletedAt?.toIso8601String(),
         'participants': participants,
-        'users_typing': usersTyping,
       };
 
   factory Chat.fromMap(Map<String, dynamic> map) => Chat(
@@ -84,12 +79,11 @@ class Chat {
         createdBy: map['created_by'] as String,
         deletedAt: map['deleted_at'] != null ? DateTime.parse(map['deleted_at']) : null,
         participants: List<String>.from(map['participants'] as List<String>),
-        usersTyping: map['users_typing'] != null ? List<String>.from(map['users_typing'] as List<String>) : null,
       );
 
   @override
   String toString() =>
-      'Chat(id: $id, chatType: $chatType, name: $name, description: $description, avatarUrl: $avatarUrl, lastMessageId: $lastMessageId, createdAt: $createdAt, createdBy: $createdBy, deletedAt: $deletedAt, participants: $participants, usersTyping: $usersTyping)';
+      'Chat(id: $id, chatType: $chatType, name: $name, description: $description, avatarUrl: $avatarUrl, lastMessageId: $lastMessageId, createdAt: $createdAt, createdBy: $createdBy, deletedAt: $deletedAt, participants: $participants)';
 
   @override
   bool operator ==(covariant Chat other) {
@@ -106,8 +100,7 @@ class Chat {
         other.createdAt == createdAt &&
         other.createdBy == createdBy &&
         other.deletedAt == deletedAt &&
-        listEquals(other.participants, participants) &&
-        listEquals(other.usersTyping, usersTyping);
+        listEquals(other.participants, participants);
   }
 
   @override
@@ -121,6 +114,5 @@ class Chat {
       createdAt.hashCode ^
       createdBy.hashCode ^
       deletedAt.hashCode ^
-      participants.hashCode ^
-      usersTyping.hashCode;
+      participants.hashCode;
 }

@@ -11,6 +11,7 @@ class ChatUserStatus {
   final String? lastReadMessageId;
   final DateTime? lastReadAt;
   final bool isMuted;
+  final bool isTyping;
   final ChatRole role;
   final DateTime joinedAt;
   final DateTime? leftAt;
@@ -19,6 +20,7 @@ class ChatUserStatus {
     required this.userId,
     required this.chatId,
     required this.isMuted,
+    required this.isTyping,
     required this.role,
     required this.joinedAt,
     this.id = '', // ID should be handled by Supabase
@@ -34,6 +36,7 @@ class ChatUserStatus {
     String? lastReadMessageId,
     DateTime? lastReadAt,
     bool? isMuted,
+    bool? isTyping,
     ChatRole? role,
     DateTime? joinedAt,
     DateTime? leftAt,
@@ -45,6 +48,7 @@ class ChatUserStatus {
         lastReadMessageId: lastReadMessageId ?? this.lastReadMessageId,
         lastReadAt: lastReadAt ?? this.lastReadAt,
         isMuted: isMuted ?? this.isMuted,
+        isTyping: isTyping ?? this.isTyping,
         role: role ?? this.role,
         joinedAt: joinedAt ?? this.joinedAt,
         leftAt: leftAt ?? this.leftAt,
@@ -57,6 +61,7 @@ class ChatUserStatus {
         'last_read_message_id': lastReadMessageId,
         'last_read_at': lastReadAt?.toIso8601String(),
         'is_muted': isMuted,
+        'is_typing': isTyping,
         'role': role.name,
         'joined_at': joinedAt.toIso8601String(),
         'left_at': leftAt?.toIso8601String(),
@@ -69,6 +74,7 @@ class ChatUserStatus {
         lastReadMessageId: map['last_read_message_id'] != null ? map['last_read_message_id'] as String : null,
         lastReadAt: map['last_read_at'] != null ? DateTime.parse(map['last_read_at']) : null,
         isMuted: map['is_muted'] as bool,
+        isTyping: map['is_typing'] as bool,
         role: ChatRole.values.byName(map['role'] as String),
         joinedAt: DateTime.parse(map['joined_at']),
         leftAt: map['left_at'] != null ? DateTime.parse(map['left_at']) : null,
@@ -76,7 +82,7 @@ class ChatUserStatus {
 
   @override
   String toString() =>
-      'ChatUserStatus(id: $id, userId: $userId, chatId: $chatId, lastReadMessageId: $lastReadMessageId, lastReadAt: $lastReadAt, isMuted: $isMuted, role: $role, joinedAt: $joinedAt, leftAt: $leftAt)';
+      'ChatUserStatus(id: $id, userId: $userId, chatId: $chatId, lastReadMessageId: $lastReadMessageId, lastReadAt: $lastReadAt, isMuted: $isMuted, isTyping: $isTyping, role: $role, joinedAt: $joinedAt, leftAt: $leftAt)';
 
   @override
   bool operator ==(covariant ChatUserStatus other) {
@@ -90,6 +96,7 @@ class ChatUserStatus {
         other.lastReadMessageId == lastReadMessageId &&
         other.lastReadAt == lastReadAt &&
         other.isMuted == isMuted &&
+        other.isTyping == isTyping &&
         other.role == role &&
         other.joinedAt == joinedAt &&
         other.leftAt == leftAt;
@@ -97,5 +104,14 @@ class ChatUserStatus {
 
   @override
   int get hashCode =>
-      id.hashCode ^ userId.hashCode ^ chatId.hashCode ^ lastReadMessageId.hashCode ^ lastReadAt.hashCode ^ isMuted.hashCode ^ role.hashCode ^ joinedAt.hashCode ^ leftAt.hashCode;
+      id.hashCode ^
+      userId.hashCode ^
+      chatId.hashCode ^
+      lastReadMessageId.hashCode ^
+      lastReadAt.hashCode ^
+      isMuted.hashCode ^
+      isTyping.hashCode ^
+      role.hashCode ^
+      joinedAt.hashCode ^
+      leftAt.hashCode;
 }

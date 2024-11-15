@@ -1,4 +1,7 @@
+// ignore_for_file: unnecessary_lambdas
+
 import '../models/chat.dart';
+import '../models/chat_user_status.dart';
 import 'logger_service.dart';
 import 'supabase_service.dart';
 
@@ -8,6 +11,25 @@ class ChatsTableService {
   ChatsTableService({
     required this.logger,
   });
+
+  ///
+  /// STREAMS
+  ///
+
+  /// Stream all `chats` for current user
+  Stream<List<Chat>> streamChats() {
+    final userId = supabase.auth.currentUser?.id;
+
+    if (userId == null) {
+      throw Exception('Not authenticated');
+    }
+
+    return supabase.from('chats').stream(primaryKey: ['id']).order('created_at').map((rows) => rows.map((row) => Chat.fromMap(row)).toList());
+  }
+
+  /// Stream a specific `chat`
+  Stream<Chat?> streamChat({required String chatId}) =>
+      supabase.from('chats').stream(primaryKey: ['id']).eq('id', chatId).map((rows) => rows.isEmpty ? null : Chat.fromMap(rows.first));
 
   ///
   /// METHODS
@@ -22,13 +44,17 @@ class ChatsTableService {
         throw Exception('Not authenticated');
       }
 
-      /// Find `chat` which has relevant `participants`
-      final chatResponse = await supabase.from('chats').select().contains(
-        'participants',
-        [userId, ...otherUserIds],
-      ).maybeSingle();
+      /// Include exact participant count to ensure correct matching
+      final allParticipants = [userId, ...otherUserIds];
 
-      /// Parse fetched `chat` to proper model
+      final chatResponse = await supabase
+          .from('chats')
+          .select()
+          .eq('chat_type', ChatType.individual.name) // Ensure it's individual chat
+          .contains('participants', allParticipants)
+          .eq('participant_count', allParticipants.length) // Exact match
+          .maybeSingle();
+
       if (chatResponse != null) {
         final chat = Chat.fromMap(chatResponse);
 
@@ -36,7 +62,7 @@ class ChatsTableService {
         return chat;
       }
 
-      logger.e('ChatsTableService -> fetchExistingChat() -> chatParticipant == null');
+      logger.e('ChatsTableService -> fetchExistingChat() -> chat not found');
       return null;
     } catch (e) {
       logger.e('ChatsTableService -> fetchExistingChat() -> $e');
@@ -45,7 +71,13 @@ class ChatsTableService {
   }
 
   /// Creates new [Chat] for `userId` and `otherUserIds`
-  Future<Chat?> createChat({required List<String> otherUserIds}) async {
+  Future<Chat?> createChat({
+    required List<String> otherUserIds,
+    required ChatType chatType,
+    String? name,
+    String? description,
+    String? avatarUrl,
+  }) async {
     try {
       final userId = supabase.auth.currentUser?.id;
 
@@ -54,25 +86,233 @@ class ChatsTableService {
       }
 
       final now = DateTime.now();
+      final allParticipants = [userId, ...otherUserIds];
+
+      /// Validate `chat` creation
+      if (chatType == ChatType.individual && allParticipants.length != 2) {
+        throw Exception('Individual chat must have exactly 2 participants');
+      }
 
       /// Create a new [Chat]
       final newChat = Chat(
-        chatType: ChatType.individual,
-        name: 'My chat!',
+        chatType: chatType,
+        name: name ?? 'New chat',
+        description: description,
+        avatarUrl: avatarUrl,
         createdAt: now,
         createdBy: userId,
-        participants: [userId, ...otherUserIds],
+        participants: allParticipants,
       );
 
       /// Store [Chat] in [Supabase]
-      final chatResponse = await supabase.from('chats').insert(newChat.toMap()).select().single();
-      final chat = Chat.fromMap(chatResponse);
+      final chatResponse = await supabase.from('chats').insert(newChat.toMap()).select().maybeSingle();
 
-      logger.t('ChatsTableService -> createChat() -> success!');
-      return chat;
+      if (chatResponse != null) {
+        final chat = Chat.fromMap(chatResponse);
+
+        /// Create [ChatUserStatus] entries for all `participants`
+        await Future.wait(
+          allParticipants.map(
+            (participantId) => supabase.from('chat_user_status').insert(
+                  ChatUserStatus(
+                    userId: participantId,
+                    chatId: chat.id,
+                    isMuted: false,
+                    isTyping: false,
+                    role: participantId == userId ? ChatRole.owner : ChatRole.member,
+                    joinedAt: now,
+                  ).toMap(),
+                ),
+          ),
+        );
+
+        logger.t('ChatsTableService -> createChat() -> success!');
+        return chat;
+      } else {
+        logger.e('ChatsTableService -> createChat() -> chatResponse == null');
+        return null;
+      }
     } catch (e) {
       logger.e('ChatsTableService -> createChat() -> $e');
       return null;
+    }
+  }
+
+  /// Update `chat` details
+  Future<Chat?> updateChat({
+    required String chatId,
+    String? name,
+    String? description,
+    String? avatarUrl,
+  }) async {
+    try {
+      final userId = supabase.auth.currentUser?.id;
+
+      if (userId == null) {
+        throw Exception('Not authenticated');
+      }
+
+      final chatResponse = await supabase
+          .from('chats')
+          .update({
+            if (name != null) 'name': name,
+            if (description != null) 'description': description,
+            if (avatarUrl != null) 'avatar_url': avatarUrl,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', chatId)
+          .select()
+          .maybeSingle();
+
+      if (chatResponse != null) {
+        final chat = Chat.fromMap(chatResponse);
+
+        logger.t('ChatsTableService -> updateChat() -> success!');
+        return chat;
+      } else {
+        logger.e('ChatsTableService -> updateChat() -> chatResponse == null');
+        return null;
+      }
+    } catch (e) {
+      logger.e('ChatsTableService -> updateChat() -> $e');
+      return null;
+    }
+  }
+
+  /// Add `participants` to a group `chat`
+  Future<bool> addParticipants({
+    required String chatId,
+    required List<String> newParticipantIds,
+  }) async {
+    try {
+      final userId = supabase.auth.currentUser?.id;
+
+      if (userId == null) {
+        throw Exception('Not authenticated');
+      }
+
+      /// Get current `chat` data
+      final chatResponse = await supabase.from('chats').select('participants, chat_type').eq('id', chatId).maybeSingle();
+
+      if (chatResponse != null) {
+        final chat = Chat.fromMap(chatResponse);
+
+        if (chat.chatType == ChatType.individual) {
+          throw Exception('Cannot add participants to individual chat');
+        }
+
+        final now = DateTime.now();
+        final allParticipants = {...chat.participants, ...newParticipantIds}.toList();
+
+        /// Update `chat` participants
+        await supabase.from('chats').update({
+          'participants': allParticipants,
+          'updated_at': now.toIso8601String(),
+        }).eq('id', chatId);
+
+        /// Create [ChatUserStatus] for new `participants`
+        await Future.wait(
+          newParticipantIds.map(
+            (participantId) => supabase.from('chat_user_status').insert(
+                  ChatUserStatus(
+                    userId: participantId,
+                    chatId: chatId,
+                    isMuted: false,
+                    isTyping: false,
+                    role: ChatRole.member,
+                    joinedAt: now,
+                  ).toMap(),
+                ),
+          ),
+        );
+
+        logger.t('ChatsTableService -> addParticipants() -> success!');
+        return true;
+      } else {
+        logger.e('ChatsTableService -> addParticipants() -> chatResponse == null');
+        return false;
+      }
+    } catch (e) {
+      logger.e('ChatsTableService -> addParticipants() -> $e');
+      return false;
+    }
+  }
+
+  /// Remove `participants` from a group `chat`
+  Future<bool> removeParticipants({
+    required String chatId,
+    required List<String> participantIds,
+  }) async {
+    try {
+      final userId = supabase.auth.currentUser?.id;
+
+      if (userId == null) {
+        throw Exception('Not authenticated');
+      }
+
+      /// Get current `chat` data
+      final chatResponse = await supabase.from('chats').select('participants, chat_type').eq('id', chatId).maybeSingle();
+
+      if (chatResponse != null) {
+        final chat = Chat.fromMap(chatResponse);
+
+        if (chat.chatType == ChatType.individual) {
+          throw Exception('Cannot remove participants from individual chat');
+        }
+
+        final now = DateTime.now();
+        final remainingParticipants = chat.participants.where((p) => !participantIds.contains(p)).toList();
+
+        if (remainingParticipants.isEmpty) {
+          throw Exception('Cannot remove all participants');
+        }
+
+        /// Update `chat` participants
+        await supabase.from('chats').update({
+          'participants': remainingParticipants,
+          'participant_count': remainingParticipants.length,
+          'updated_at': now.toIso8601String(),
+        }).eq('id', chatId);
+
+        /// Update [ChatUserStatus] for removed `participants`
+        await supabase
+            .from('chat_user_status')
+            .update({
+              'left_at': DateTime.now().toIso8601String(),
+            })
+            .eq('chat_id', chatId)
+            .inFilter('user_id', participantIds);
+
+        logger.t('ChatsTableService -> removeParticipants() -> success!');
+        return true;
+      } else {
+        logger.e('ChatsTableService -> removeParticipants() -> chatResponse == null');
+        return false;
+      }
+    } catch (e) {
+      logger.e('ChatsTableService -> removeParticipants() -> $e');
+      return false;
+    }
+  }
+
+  /// Delete a `chat` (soft delete)
+  Future<bool> deleteChat({required String chatId}) async {
+    try {
+      final userId = supabase.auth.currentUser?.id;
+
+      if (userId == null) {
+        throw Exception('Not authenticated');
+      }
+
+      await supabase.from('chats').update({
+        'deleted_at': DateTime.now().toIso8601String(),
+      }).eq('id', chatId);
+
+      logger.t('ChatsTableService -> deleteChat() -> success!');
+      return true;
+    } catch (e) {
+      logger.e('ChatsTableService -> deleteChat() -> $e');
+      return false;
     }
   }
 }

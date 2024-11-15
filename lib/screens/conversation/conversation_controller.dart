@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
+import '../../models/chat.dart';
 import '../../models/message.dart';
 import '../../services/auth_service.dart';
+import '../../services/chat_user_status_table_service.dart';
 import '../../services/chats_table_service.dart';
 import '../../services/logger_service.dart';
 import '../../services/messages_table_service.dart';
@@ -12,12 +14,14 @@ class ConversationController extends ValueNotifier<RazgovorkoState<String>> impl
   final LoggerService logger;
   final AuthService auth;
   final ChatsTableService chatsTable;
+  final ChatUserStatusTableService chatUserStatusTable;
   final MessagesTableService messagesTable;
 
   ConversationController({
     required this.logger,
     required this.auth,
     required this.chatsTable,
+    required this.chatUserStatusTable,
     required this.messagesTable,
   }) : super(Initial());
 
@@ -83,15 +87,16 @@ class ConversationController extends ValueNotifier<RazgovorkoState<String>> impl
       else {
         final newChat = await chatsTable.createChat(
           otherUserIds: otherUserIds,
+          chatType: ChatType.individual,
         );
 
-        /// `chat` successfully created, return `chatId`
+        /// `chat` successfully created, return it
         if (newChat?.id != null) {
           logger.t('ConversationController -> getChatId() -> new chat -> success!');
           return newChat!.id;
         }
 
-        /// Error creatubg `chat`, return `null`
+        /// Error creating `chat`, return `null`
         else {
           logger.e('ConversationController -> getChatId() -> newChat == null');
           return null;
@@ -104,7 +109,7 @@ class ConversationController extends ValueNotifier<RazgovorkoState<String>> impl
   }
 
   /// Returns a [Stream] which listens `List<Message>` within the `messages` table
-  Stream<List<Message>> streamMessages({required String chatId}) => messagesTable.streamMessages(chatId: chatId);
+  Stream<List<Message>?> streamMessages({required String chatId}) => messagesTable.streamMessages(chatId: chatId);
 
   /// Triggered when the user sends a message
   Future<bool> sendMessage({
@@ -126,13 +131,15 @@ class ConversationController extends ValueNotifier<RazgovorkoState<String>> impl
       final messageText = messageController.text.trim();
 
       /// Try to send message
-      final messageSent = await messagesTable.sendMessage(
+      final message = await messagesTable.sendMessage(
         chatId: chatId,
-        messageText: messageText,
+        content: messageText,
+        messageType: MessageType.text,
+        isViewOnce: false,
       );
 
       /// Message sent successfully, clear `messageController`
-      if (messageSent) {
+      if (message != null) {
         messageController.clear();
         logger.t('ConversationController -> sendMessage() -> success!');
         return true;
