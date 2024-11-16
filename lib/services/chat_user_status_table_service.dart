@@ -52,7 +52,7 @@ class ChatUserStatusTableService {
 
   /// User joins / creates a `chat`
   Future<bool> createChatUserStatus({
-    required String passedUserId,
+    required List<String> participants,
     required String chatId,
   }) async {
     try {
@@ -62,16 +62,21 @@ class ChatUserStatusTableService {
         throw Exception('Not authenticated');
       }
 
-      await supabase.from('chat_user_status').upsert(
-            ChatUserStatus(
-              userId: userId,
-              chatId: chatId,
-              isMuted: false,
-              isTyping: false,
-              role: passedUserId == userId ? ChatRole.owner : ChatRole.member,
-              joinedAt: DateTime.now(),
-            ).toMap(),
-          );
+      /// Create [ChatUserStatus] entries for all `participants`
+      await Future.wait(
+        participants.map(
+          (participantId) => supabase.from('chat_user_status').upsert(
+                ChatUserStatus(
+                  userId: participantId,
+                  chatId: chatId,
+                  isMuted: false,
+                  isTyping: false,
+                  role: participantId == userId ? ChatRole.owner : ChatRole.member,
+                  joinedAt: DateTime.now(),
+                ).toMap(),
+              ),
+        ),
+      );
 
       logger.t('ChatUserStatusTableService -> createChatUserStatus() -> success!');
       return true;

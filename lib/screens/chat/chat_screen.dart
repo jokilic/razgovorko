@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import '../../dependencies.dart';
 import '../../routing.dart';
 import '../../services/auth_service.dart';
+import '../../services/chat_user_status_table_service.dart';
+import '../../services/chats_table_service.dart';
 import '../../services/logger_service.dart';
+import '../../services/messages_table_service.dart';
 import '../../services/users_table_service.dart';
 import 'chat_controller.dart';
 
@@ -22,6 +25,9 @@ class _ChatScreenState extends State<ChatScreen> {
         logger: getIt.get<LoggerService>(),
         auth: getIt.get<AuthService>(),
         usersTable: getIt.get<UsersTableService>(),
+        chatsTable: getIt.get<ChatsTableService>(),
+        chatUserStatusTable: getIt.get<ChatUserStatusTableService>(),
+        messagesTable: getIt.get<MessagesTableService>(),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
 
 import '../../dependencies.dart';
+import '../../models/chat.dart';
 import '../../models/user.dart';
 import '../../services/auth_service.dart';
 import '../../services/chat_user_status_table_service.dart';
@@ -37,6 +38,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
       ),
       afterRegister: (controller) => controller.init(
         otherUserIds: [widget.otherUser.id],
+        chatType: ChatType.individual,
       ),
     );
   }

@@ -78,7 +78,7 @@ class Chat {
         createdAt: DateTime.parse(map['created_at']),
         createdBy: map['created_by'] as String,
         deletedAt: map['deleted_at'] != null ? DateTime.parse(map['deleted_at']) : null,
-        participants: List<String>.from(map['participants'] as List<String>),
+        participants: List<String>.from(map['participants'] as List),
       );
 
   @override

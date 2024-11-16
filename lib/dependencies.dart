@@ -57,16 +57,17 @@ void initializeServices() => getIt
     dependsOn: [LoggerService],
   )
   ..registerSingletonAsync(
-    () async => ChatsTableService(
+    () async => ChatUserStatusTableService(
       logger: getIt.get<LoggerService>(),
     ),
     dependsOn: [LoggerService],
   )
   ..registerSingletonAsync(
-    () async => ChatUserStatusTableService(
+    () async => ChatsTableService(
       logger: getIt.get<LoggerService>(),
+      chatUserStatusTable: getIt.get<ChatUserStatusTableService>(),
     ),
-    dependsOn: [LoggerService],
+    dependsOn: [LoggerService, ChatUserStatusTableService],
   )
   ..registerSingletonAsync(
     () async => MessagesTableService(

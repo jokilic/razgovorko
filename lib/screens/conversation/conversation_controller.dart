@@ -45,12 +45,20 @@ class ConversationController extends ValueNotifier<RazgovorkoState<String>> impl
   ///
 
   /// Gets `chatId` and stores in `state`
-  Future<void> init({required List<String> otherUserIds}) async {
+  Future<void> init({
+    required List<String> otherUserIds,
+    required ChatType chatType,
+    String? name,
+  }) async {
     try {
       value = Loading();
 
       /// Try to fetch `chatId`
-      final chatId = await getChatId(otherUserIds: otherUserIds);
+      final chatId = await getChatId(
+        otherUserIds: otherUserIds,
+        chatType: chatType,
+        name: name,
+      );
 
       /// `chatId` fetched
       if (chatId != null) {
@@ -70,11 +78,17 @@ class ConversationController extends ValueNotifier<RazgovorkoState<String>> impl
   }
 
   /// Return `chatId` from existing or new `chat` between `currentUser` and `otherUsers`
-  Future<String?> getChatId({required List<String> otherUserIds}) async {
+  Future<String?> getChatId({
+    required List<String> otherUserIds,
+    required ChatType chatType,
+    String? name,
+  }) async {
     try {
       /// Try to get existing `chatId`
       final existingChat = await chatsTable.fetchExistingChat(
         otherUserIds: otherUserIds,
+        chatType: chatType,
+        name: name,
       );
 
       /// `chatId` exists
@@ -87,7 +101,8 @@ class ConversationController extends ValueNotifier<RazgovorkoState<String>> impl
       else {
         final newChat = await chatsTable.createChat(
           otherUserIds: otherUserIds,
-          chatType: ChatType.individual,
+          chatType: chatType,
+          name: name,
         );
 
         /// `chat` successfully created, return it

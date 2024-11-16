@@ -2,14 +2,17 @@
 
 import '../models/chat.dart';
 import '../models/chat_user_status.dart';
+import 'chat_user_status_table_service.dart';
 import 'logger_service.dart';
 import 'supabase_service.dart';
 
 class ChatsTableService {
   final LoggerService logger;
+  final ChatUserStatusTableService chatUserStatusTable;
 
   ChatsTableService({
     required this.logger,
+    required this.chatUserStatusTable,
   });
 
   ///
@@ -36,8 +39,16 @@ class ChatsTableService {
   ///
 
   /// Returns [Chat] between `userId` and `otherUserIds` or `null` if it doesn't exist
-  Future<Chat?> fetchExistingChat({required List<String> otherUserIds}) async {
+  Future<Chat?> fetchExistingChat({
+    required List<String> otherUserIds,
+    required ChatType chatType,
+    String? name,
+  }) async {
     try {
+      if (chatType == ChatType.group && name == null) {
+        throw Exception('Group chat should have a name');
+      }
+
       final userId = supabase.auth.currentUser?.id;
 
       if (userId == null) {
@@ -47,13 +58,14 @@ class ChatsTableService {
       /// Include exact participant count to ensure correct matching
       final allParticipants = [userId, ...otherUserIds];
 
-      final chatResponse = await supabase
-          .from('chats')
-          .select()
-          .eq('chat_type', ChatType.individual.name) // Ensure it's individual chat
-          .contains('participants', allParticipants)
-          .eq('participant_count', allParticipants.length) // Exact match
-          .maybeSingle();
+      var query = supabase.from('chats').select().eq('chat_type', chatType.name).contains('participants', allParticipants);
+
+      /// Finding a group, `name` is required
+      if (chatType == ChatType.group) {
+        query = query.eq('name', name!);
+      }
+
+      final chatResponse = await query.maybeSingle();
 
       if (chatResponse != null) {
         final chat = Chat.fromMap(chatResponse);
@@ -110,20 +122,9 @@ class ChatsTableService {
       if (chatResponse != null) {
         final chat = Chat.fromMap(chatResponse);
 
-        /// Create [ChatUserStatus] entries for all `participants`
-        await Future.wait(
-          allParticipants.map(
-            (participantId) => supabase.from('chat_user_status').insert(
-                  ChatUserStatus(
-                    userId: participantId,
-                    chatId: chat.id,
-                    isMuted: false,
-                    isTyping: false,
-                    role: participantId == userId ? ChatRole.owner : ChatRole.member,
-                    joinedAt: now,
-                  ).toMap(),
-                ),
-          ),
+        await chatUserStatusTable.createChatUserStatus(
+          participants: allParticipants,
+          chatId: chat.id,
         );
 
         logger.t('ChatsTableService -> createChat() -> success!');
@@ -244,12 +245,6 @@ class ChatsTableService {
     required List<String> participantIds,
   }) async {
     try {
-      final userId = supabase.auth.currentUser?.id;
-
-      if (userId == null) {
-        throw Exception('Not authenticated');
-      }
-
       /// Get current `chat` data
       final chatResponse = await supabase.from('chats').select('participants, chat_type').eq('id', chatId).maybeSingle();
 
@@ -270,7 +265,6 @@ class ChatsTableService {
         /// Update `chat` participants
         await supabase.from('chats').update({
           'participants': remainingParticipants,
-          'participant_count': remainingParticipants.length,
           'updated_at': now.toIso8601String(),
         }).eq('id', chatId);
 
