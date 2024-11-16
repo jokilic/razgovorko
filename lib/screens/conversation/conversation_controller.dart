@@ -8,6 +8,7 @@ import '../../services/chat_user_status_table_service.dart';
 import '../../services/chats_table_service.dart';
 import '../../services/logger_service.dart';
 import '../../services/messages_table_service.dart';
+import '../../services/supabase_service.dart';
 import '../../util/state.dart';
 
 class ConversationController extends ValueNotifier<RazgovorkoState<String>> implements Disposable {
@@ -85,7 +86,7 @@ class ConversationController extends ValueNotifier<RazgovorkoState<String>> impl
   }) async {
     try {
       /// Try to get existing `chatId`
-      final existingChat = await chatsTable.fetchExistingChat(
+      final existingChat = await chatsTable.getChat(
         otherUserIds: otherUserIds,
         chatType: chatType,
         name: name,
@@ -105,10 +106,24 @@ class ConversationController extends ValueNotifier<RazgovorkoState<String>> impl
           name: name,
         );
 
-        /// `chat` successfully created, return it
+        /// Create [ChatUserStatus] for each `participant`
         if (newChat?.id != null) {
-          logger.t('ConversationController -> getChatId() -> new chat -> success!');
-          return newChat!.id;
+          final chatUserStatus = await chatUserStatusTable.createChatUserStatus(
+            participants: [supabase.auth.currentUser!.id, ...otherUserIds],
+            chatId: newChat!.id,
+          );
+
+          /// `chat` successfully created, return it
+          if (chatUserStatus) {
+            logger.t('ConversationController -> getChatId() -> new chat -> success!');
+            return newChat.id;
+          }
+
+          /// Error creating [ChatUserStatus], return `null`
+          else {
+            logger.e('ConversationController -> getChatId() -> newChat == null');
+            return null;
+          }
         }
 
         /// Error creating `chat`, return `null`

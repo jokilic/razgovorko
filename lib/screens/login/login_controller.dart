@@ -79,7 +79,7 @@ class LoginController implements Disposable {
       final supabaseUser = authResponse?.user;
 
       if (supabaseUser != null) {
-        final razgovorkoUser = await usersTable.storeUserDataInDatabase(
+        final razgovorkoUser = await usersTable.createUserProfile(
           supabaseUser: supabaseUser,
         );
 

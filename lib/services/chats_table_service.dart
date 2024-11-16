@@ -1,68 +1,67 @@
 // ignore_for_file: unnecessary_lambdas
 
 import '../models/chat.dart';
-import '../models/chat_user_status.dart';
-import 'chat_user_status_table_service.dart';
 import 'logger_service.dart';
 import 'supabase_service.dart';
 
 class ChatsTableService {
   final LoggerService logger;
-  final ChatUserStatusTableService chatUserStatusTable;
 
   ChatsTableService({
     required this.logger,
-    required this.chatUserStatusTable,
   });
 
   ///
   /// STREAMS
   ///
 
-  /// Stream all `chats` for current user
-  Stream<List<Chat>> streamChats() {
+  /// Stream all `chats` for `currentUser`
+  Stream<List<Chat>?> streamCurrentUserChats() {
     final userId = supabase.auth.currentUser?.id;
 
     if (userId == null) {
       throw Exception('Not authenticated');
     }
 
-    return supabase.from('chats').stream(primaryKey: ['id']).order('created_at').map((rows) => rows.map((row) => Chat.fromMap(row)).toList());
+    return supabase.from('chats').stream(primaryKey: ['id']).order('created_at').map(
+          (data) => data.isNotEmpty ? data.map((json) => Chat.fromMap(json)).toList() : null,
+        );
   }
 
   /// Stream a specific `chat`
-  Stream<Chat?> streamChat({required String chatId}) =>
-      supabase.from('chats').stream(primaryKey: ['id']).eq('id', chatId).map((rows) => rows.isEmpty ? null : Chat.fromMap(rows.first));
+  Stream<Chat?> streamChat({required String chatId}) => supabase.from('chats').stream(primaryKey: ['id']).eq('id', chatId).map(
+        (data) => data.isNotEmpty ? Chat.fromMap(data.first) : null,
+      );
 
   ///
   /// METHODS
   ///
 
-  /// Returns [Chat] between `userId` and `otherUserIds` or `null` if it doesn't exist
-  Future<Chat?> fetchExistingChat({
+  /// Returns [Chat] or `null` if it doesn't exist
+  Future<Chat?> getChat({
     required List<String> otherUserIds,
     required ChatType chatType,
     String? name,
   }) async {
     try {
-      if (chatType == ChatType.group && name == null) {
-        throw Exception('Group chat should have a name');
-      }
-
       final userId = supabase.auth.currentUser?.id;
 
       if (userId == null) {
         throw Exception('Not authenticated');
       }
 
-      /// Include exact participant count to ensure correct matching
+      if (chatType == ChatType.group && name == null) {
+        throw Exception('Group chat should have a name');
+      }
+
+      /// Create a list of `participantIds`
       final allParticipants = [userId, ...otherUserIds];
 
       var query = supabase.from('chats').select().eq('chat_type', chatType.name).contains('participants', allParticipants);
 
       /// Finding a group, `name` is required
-      if (chatType == ChatType.group) {
-        query = query.eq('name', name!);
+      if (chatType == ChatType.group && name != null) {
+        query = query.eq('name', name);
       }
 
       final chatResponse = await query.maybeSingle();
@@ -82,7 +81,7 @@ class ChatsTableService {
     }
   }
 
-  /// Creates new [Chat] for `userId` and `otherUserIds`
+  /// Creates new [Chat]
   Future<Chat?> createChat({
     required List<String> otherUserIds,
     required ChatType chatType,
@@ -121,11 +120,6 @@ class ChatsTableService {
 
       if (chatResponse != null) {
         final chat = Chat.fromMap(chatResponse);
-
-        await chatUserStatusTable.createChatUserStatus(
-          participants: allParticipants,
-          chatId: chat.id,
-        );
 
         logger.t('ChatsTableService -> createChat() -> success!');
         return chat;
@@ -202,30 +196,16 @@ class ChatsTableService {
           throw Exception('Cannot add participants to individual chat');
         }
 
-        final now = DateTime.now();
         final allParticipants = {...chat.participants, ...newParticipantIds}.toList();
 
         /// Update `chat` participants
         await supabase.from('chats').update({
           'participants': allParticipants,
-          'updated_at': now.toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
         }).eq('id', chatId);
 
         /// Create [ChatUserStatus] for new `participants`
-        await Future.wait(
-          newParticipantIds.map(
-            (participantId) => supabase.from('chat_user_status').insert(
-                  ChatUserStatus(
-                    userId: participantId,
-                    chatId: chatId,
-                    isMuted: false,
-                    isTyping: false,
-                    role: ChatRole.member,
-                    joinedAt: now,
-                  ).toMap(),
-                ),
-          ),
-        );
+        // TODO: Need to trigger ChatUserStatusTableService.createChatUserStatus() for all new participants
 
         logger.t('ChatsTableService -> addParticipants() -> success!');
         return true;
@@ -240,7 +220,7 @@ class ChatsTableService {
   }
 
   /// Remove `participants` from a group `chat`
-  Future<bool> removeParticipants({
+  Future<bool> deleteParticipants({
     required String chatId,
     required List<String> participantIds,
   }) async {
@@ -255,7 +235,6 @@ class ChatsTableService {
           throw Exception('Cannot remove participants from individual chat');
         }
 
-        final now = DateTime.now();
         final remainingParticipants = chat.participants.where((p) => !participantIds.contains(p)).toList();
 
         if (remainingParticipants.isEmpty) {
@@ -265,17 +244,11 @@ class ChatsTableService {
         /// Update `chat` participants
         await supabase.from('chats').update({
           'participants': remainingParticipants,
-          'updated_at': now.toIso8601String(),
+          'updated_at': DateTime.now().toIso8601String(),
         }).eq('id', chatId);
 
-        /// Update [ChatUserStatus] for removed `participants`
-        await supabase
-            .from('chat_user_status')
-            .update({
-              'left_at': DateTime.now().toIso8601String(),
-            })
-            .eq('chat_id', chatId)
-            .inFilter('user_id', participantIds);
+        /// Remove [ChatUserStatus] for new `participantIds`
+        // TODO: Need to trigger ChatUserStatusTableService.removeChatUserStatus() for all new participants
 
         logger.t('ChatsTableService -> removeParticipants() -> success!');
         return true;
@@ -289,7 +262,7 @@ class ChatsTableService {
     }
   }
 
-  /// Delete a `chat` (soft delete)
+  /// Soft delete `chat`
   Future<bool> deleteChat({required String chatId}) async {
     try {
       final userId = supabase.auth.currentUser?.id;

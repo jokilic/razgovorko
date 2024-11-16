@@ -74,7 +74,7 @@ class ChatController {
   /// CHAT MANAGEMENT
   ///
 
-  /// Start or get existing `chat` with user(s)
+  /// Start or get existing `chat` with users
   Future<Chat?> startChat({
     required List<String> otherUserIds,
     required ChatType chatType,
@@ -89,7 +89,7 @@ class ChatController {
         }
 
         /// Check for existing `chat`
-        final existingChat = await chatsTable.fetchExistingChat(
+        final existingChat = await chatsTable.getChat(
           otherUserIds: otherUserIds,
           chatType: chatType,
           name: name,
@@ -100,12 +100,18 @@ class ChatController {
         }
       }
 
-      /// Create new chat
+      /// Create new `chat`
       final chat = await chatsTable.createChat(
         otherUserIds: otherUserIds,
         chatType: chatType,
         name: name,
         description: description,
+      );
+
+      /// Create [ChatUserStatus] for each `participant`
+      await chatUserStatusTable.createChatUserStatus(
+        participants: [supabase.auth.currentUser!.id, ...otherUserIds],
+        chatId: chat!.id,
       );
 
       logger.t('ChatController -> startChat() -> success!');
@@ -117,7 +123,7 @@ class ChatController {
   }
 
   /// Stream current users `chats`
-  Stream<List<({Chat chat, int? unreadCount})>> streamChatsWithUnreadCounts() => chatsTable.streamChats().asyncMap((chats) async {
+  Stream<List<({Chat chat, int? unreadCount})>> streamChatsWithUnreadCounts() => chatsTable.streamCurrentUserChats().asyncMap((chats) async {
         final counts = await Future.wait(
           chats.map((chat) async {
             final count = await chatUserStatusTable.getUnreadCount(
@@ -251,7 +257,7 @@ class ChatController {
 
       await Future.wait([
         chatUserStatusTable.leaveChat(chatId: chatId),
-        chatsTable.removeParticipants(
+        chatsTable.deleteParticipants(
           chatId: chatId,
           participantIds: [userId],
         ),

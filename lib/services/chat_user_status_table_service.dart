@@ -86,6 +86,35 @@ class ChatUserStatusTableService {
     }
   }
 
+  /// User leaves a `chat`
+  Future<bool> removeChatUserStatus({
+    required List<String> participants,
+    required String chatId,
+  }) async {
+    try {
+      final userId = supabase.auth.currentUser?.id;
+
+      if (userId == null) {
+        throw Exception('Not authenticated');
+      }
+
+      /// Update [ChatUserStatus] for removed `participants`
+      await supabase
+          .from('chat_user_status')
+          .update({
+            'left_at': DateTime.now().toIso8601String(),
+          })
+          .eq('chat_id', chatId)
+          .inFilter('user_id', participants);
+
+      logger.t('ChatUserStatusTableService -> removeChatUserStatus() -> success!');
+      return true;
+    } catch (e) {
+      logger.e('ChatUserStatusTableService -> removeChatUserStatus() -> $e');
+      return false;
+    }
+  }
+
   /// User opens a `chat` (mark messages as read)
   Future<bool> markChatAsRead({
     required String chatId,

@@ -25,10 +25,12 @@ class UsersTableService {
       return Stream.value(null);
     }
 
-    return supabase.from('users').stream(primaryKey: ['id']).eq('id', userId).map((data) => data.isNotEmpty ? RazgovorkoUser.fromMap(data.first) : null);
+    return supabase.from('users').stream(primaryKey: ['id']).eq('id', userId).map(
+          (data) => data.isNotEmpty ? RazgovorkoUser.fromMap(data.first) : null,
+        );
   }
 
-  /// Stream all users except current user
+  /// Stream all `users` except `currentUser`
   Stream<List<RazgovorkoUser>?> streamAllUsers() {
     final userId = supabase.auth.currentUser?.id;
 
@@ -41,13 +43,15 @@ class UsersTableService {
         .stream(primaryKey: ['id'])
         .neq('id', userId) // Exclude current user
         .order('display_name') // Order by name
-        .map((data) => data.isNotEmpty ? data.map((json) => RazgovorkoUser.fromMap(json)).toList() : null);
+        .map(
+          (data) => data.isNotEmpty ? data.map((json) => RazgovorkoUser.fromMap(json)).toList() : null,
+        );
   }
 
-  /// Stream specific users by IDs
+  /// Stream specific `users` by IDs
   Stream<List<RazgovorkoUser>?> streamUsersByIds(List<String> userIds) {
     if (userIds.isEmpty) {
-      return Stream.value([]);
+      return Stream.value(null);
     }
 
     return supabase.from('users').stream(primaryKey: ['id']).inFilter('id', userIds).map(
@@ -60,7 +64,7 @@ class UsersTableService {
   ///
 
   /// Stores user data in `users` table
-  Future<RazgovorkoUser?> storeUserDataInDatabase({
+  Future<RazgovorkoUser?> createUserProfile({
     required User supabaseUser,
     String? displayName,
     String? avatarUrl,
@@ -183,7 +187,7 @@ class UsersTableService {
     }
   }
 
-  /// Search users
+  /// Searches `display_name`, `email` and `phone_number` columns in the `users` table using the passed `query`
   Future<List<RazgovorkoUser>?> searchUsers({required String query}) async {
     try {
       final userId = supabase.auth.currentUser?.id;
@@ -209,8 +213,28 @@ class UsersTableService {
     }
   }
 
+  /// Get `user` by ID
+  Future<RazgovorkoUser?> getUserById({required String userId}) async {
+    try {
+      final userResponse = await supabase.from('users').select().eq('id', userId).eq('is_deleted', false).maybeSingle();
+
+      if (userResponse != null) {
+        final user = RazgovorkoUser.fromMap(userResponse);
+
+        logger.t('UsersTableService -> getUserById() -> success!');
+        return user;
+      } else {
+        logger.e('UsersTableService -> getUserById() -> userResponse == null');
+        return null;
+      }
+    } catch (e) {
+      logger.e('UsersTableService -> getUserById() -> $e');
+      return null;
+    }
+  }
+
   /// Soft delete `user` account
-  Future<bool> deleteAccount() async {
+  Future<bool> deleteUserProfile() async {
     try {
       final userId = supabase.auth.currentUser?.id;
 
@@ -229,26 +253,6 @@ class UsersTableService {
     } catch (e) {
       logger.e('UsersTableService -> deleteAccount() -> $e');
       return false;
-    }
-  }
-
-  /// Get `user` by ID
-  Future<RazgovorkoUser?> getUserById({required String userId}) async {
-    try {
-      final userResponse = await supabase.from('users').select().eq('id', userId).eq('is_deleted', false).maybeSingle();
-
-      if (userResponse != null) {
-        final user = RazgovorkoUser.fromMap(userResponse);
-
-        logger.t('UsersTableService -> getUserById() -> success!');
-        return user;
-      } else {
-        logger.e('UsersTableService -> getUserById() -> userResponse == null');
-        return null;
-      }
-    } catch (e) {
-      logger.e('UsersTableService -> getUserById() -> $e');
-      return null;
     }
   }
 }
