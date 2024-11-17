@@ -4,6 +4,7 @@ import 'services/auth_service.dart';
 import 'services/chat_user_status_table_service.dart';
 import 'services/chats_table_service.dart';
 import 'services/logger_service.dart';
+import 'services/message_user_status_table_service.dart';
 import 'services/messages_table_service.dart';
 import 'services/supabase_service.dart';
 import 'services/users_table_service.dart';
@@ -57,20 +58,25 @@ void initializeServices() => getIt
     dependsOn: [LoggerService],
   )
   ..registerSingletonAsync(
+    () async => ChatsTableService(
+      logger: getIt.get<LoggerService>(),
+    ),
+    dependsOn: [LoggerService],
+  )
+  ..registerSingletonAsync(
     () async => ChatUserStatusTableService(
       logger: getIt.get<LoggerService>(),
     ),
     dependsOn: [LoggerService],
   )
   ..registerSingletonAsync(
-    () async => ChatsTableService(
+    () async => MessagesTableService(
       logger: getIt.get<LoggerService>(),
-      chatUserStatusTable: getIt.get<ChatUserStatusTableService>(),
     ),
-    dependsOn: [LoggerService, ChatUserStatusTableService],
+    dependsOn: [LoggerService],
   )
   ..registerSingletonAsync(
-    () async => MessagesTableService(
+    () async => MessageUserStatusTableService(
       logger: getIt.get<LoggerService>(),
     ),
     dependsOn: [LoggerService],

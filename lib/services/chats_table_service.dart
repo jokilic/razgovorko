@@ -69,14 +69,14 @@ class ChatsTableService {
       if (chatResponse != null) {
         final chat = Chat.fromMap(chatResponse);
 
-        logger.t('ChatsTableService -> fetchExistingChat() -> success!');
+        logger.t('ChatsTableService -> getChat() -> success!');
         return chat;
       }
 
-      logger.e('ChatsTableService -> fetchExistingChat() -> chat not found');
+      logger.e('ChatsTableService -> getChat() -> chat not found');
       return null;
     } catch (e) {
-      logger.e('ChatsTableService -> fetchExistingChat() -> $e');
+      logger.e('ChatsTableService -> getChat() -> $e');
       return null;
     }
   }
@@ -204,9 +204,6 @@ class ChatsTableService {
           'updated_at': DateTime.now().toIso8601String(),
         }).eq('id', chatId);
 
-        /// Create [ChatUserStatus] for new `participants`
-        // TODO: Need to trigger ChatUserStatusTableService.createChatUserStatus() for all new participants
-
         logger.t('ChatsTableService -> addParticipants() -> success!');
         return true;
       } else {
@@ -247,17 +244,14 @@ class ChatsTableService {
           'updated_at': DateTime.now().toIso8601String(),
         }).eq('id', chatId);
 
-        /// Remove [ChatUserStatus] for new `participantIds`
-        // TODO: Need to trigger ChatUserStatusTableService.removeChatUserStatus() for all new participants
-
-        logger.t('ChatsTableService -> removeParticipants() -> success!');
+        logger.t('ChatsTableService -> deleteParticipants() -> success!');
         return true;
       } else {
-        logger.e('ChatsTableService -> removeParticipants() -> chatResponse == null');
+        logger.e('ChatsTableService -> deleteParticipants() -> chatResponse == null');
         return false;
       }
     } catch (e) {
-      logger.e('ChatsTableService -> removeParticipants() -> $e');
+      logger.e('ChatsTableService -> deleteParticipants() -> $e');
       return false;
     }
   }

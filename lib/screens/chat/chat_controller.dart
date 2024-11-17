@@ -123,21 +123,25 @@ class ChatController {
   }
 
   /// Stream current users `chats`
-  Stream<List<({Chat chat, int? unreadCount})>> streamChatsWithUnreadCounts() => chatsTable.streamCurrentUserChats().asyncMap((chats) async {
-        final counts = await Future.wait(
-          chats.map((chat) async {
-            final count = await chatUserStatusTable.getUnreadCount(
-              chatId: chat.id,
-            );
+  Stream<List<({Chat chat, int? unreadCount})>> streamChatsWithUnreadCounts() => chatsTable.streamCurrentUserChats().asyncMap(
+        (chats) async {
+          final counts = await Future.wait(
+            chats!.map(
+              (chat) async {
+                final count = await chatUserStatusTable.getUnreadCount(
+                  chatId: chat.id,
+                );
 
-            return (
-              chat: chat,
-              unreadCount: count,
-            );
-          }),
-        );
-        return counts;
-      });
+                return (
+                  chat: chat,
+                  unreadCount: count,
+                );
+              },
+            ),
+          );
+          return counts;
+        },
+      );
 
   ///
   /// MESSAGE MANAGEMENT
@@ -164,7 +168,7 @@ class ChatController {
 
       switch (messageType) {
         case MessageType.text:
-          message = await messagesTable.sendMessage(
+          message = await messagesTable.createMessage(
             chatId: chatId,
             content: content,
             messageType: messageType,
@@ -218,7 +222,7 @@ class ChatController {
   Stream<List<String>> streamTypingUsers({
     required String chatId,
   }) =>
-      chatUserStatusTable.streamTypingUsers(
+      chatUserStatusTable.streamTypingUserIds(
         chatId: chatId,
       );
 
@@ -261,6 +265,10 @@ class ChatController {
           chatId: chatId,
           participantIds: [userId],
         ),
+        chatUserStatusTable.removeChatUserStatus(
+          participants: [userId],
+          chatId: chatId,
+        ),
       ]);
       logger.t('ChatController -> leaveChat() -> success!');
     } catch (e) {
@@ -272,11 +280,32 @@ class ChatController {
   Future<bool> addParticipants({
     required String chatId,
     required List<String> userIds,
-  }) =>
-      chatsTable.addParticipants(
+  }) async {
+    /// Add new `participants`
+    final participantsResponse = await chatsTable.addParticipants(
+      chatId: chatId,
+      newParticipantIds: userIds,
+    );
+
+    /// Create [ChatUserStatus] for new `participants`
+    if (participantsResponse) {
+      final chatUserStatusResponse = await chatUserStatusTable.createChatUserStatus(
+        participants: userIds,
         chatId: chatId,
-        newParticipantIds: userIds,
       );
+
+      if (chatUserStatusResponse) {
+        logger.t('ChatController -> leaveChat() -> success!');
+        return true;
+      } else {
+        logger.e('ChatController -> leaveChat() -> chatUserStatusResponse == null');
+        return false;
+      }
+    } else {
+      logger.e('ChatController -> leaveChat() -> participantsResponse ==  null');
+      return false;
+    }
+  }
 
   ///
   /// REACTIONS
@@ -287,7 +316,7 @@ class ChatController {
     required String messageId,
     required String reaction,
   }) =>
-      messagesTable.addReaction(
+      messagesTable.createReaction(
         messageId: messageId,
         reaction: reaction,
       );

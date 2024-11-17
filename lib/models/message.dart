@@ -1,7 +1,3 @@
-import 'package:flutter/foundation.dart';
-
-import 'reaction.dart';
-
 enum MessageType {
   text,
   image,
@@ -26,9 +22,7 @@ class Message {
   final bool isDeleted;
   final DateTime createdAt;
   final DateTime? updatedAt;
-  final DateTime? viewedAt;
   final DateTime? deletedAt;
-  final List<Reaction>? reactions;
 
   Message({
     required this.chatId,
@@ -41,9 +35,7 @@ class Message {
     this.id = '', // ID should be handled by Supabase
     this.replyToMessageId,
     this.updatedAt,
-    this.viewedAt,
     this.deletedAt,
-    this.reactions,
   });
 
   Message copyWith({
@@ -59,7 +51,6 @@ class Message {
     DateTime? updatedAt,
     DateTime? viewedAt,
     DateTime? deletedAt,
-    List<Reaction>? reactions,
   }) =>
       Message(
         id: id ?? this.id,
@@ -72,9 +63,7 @@ class Message {
         isDeleted: isDeleted ?? this.isDeleted,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
-        viewedAt: viewedAt ?? this.viewedAt,
         deletedAt: deletedAt ?? this.deletedAt,
-        reactions: reactions ?? this.reactions,
       );
 
   Map<String, dynamic> toMap() => <String, dynamic>{
@@ -88,9 +77,7 @@ class Message {
         'is_deleted': isDeleted,
         'created_at': createdAt.toIso8601String(),
         'updated_at': updatedAt?.toIso8601String(),
-        'viewed_at': viewedAt?.toIso8601String(),
         'deleted_at': deletedAt?.toIso8601String(),
-        'reactions': reactions?.map((x) => x.toMap()).toList(),
       };
 
   factory Message.fromMap(Map<String, dynamic> map) => Message(
@@ -104,20 +91,12 @@ class Message {
         isDeleted: map['is_deleted'] as bool,
         createdAt: DateTime.parse(map['created_at']),
         updatedAt: map['updated_at'] != null ? DateTime.parse(map['updated_at']) : null,
-        viewedAt: map['viewed_at'] != null ? DateTime.parse(map['viewed_at']) : null,
         deletedAt: map['deleted_at'] != null ? DateTime.parse(map['deleted_at']) : null,
-        reactions: map['reactions'] != null
-            ? List<Reaction>.from(
-                (map['reactions'] as List).map<Reaction?>(
-                  (x) => Reaction.fromMap(x as Map<String, dynamic>),
-                ),
-              )
-            : null,
       );
 
   @override
   String toString() =>
-      'Message(id: $id, chatId: $chatId, senderId: $senderId, messageType: $messageType, content: $content, replyToMessageId: $replyToMessageId, isViewOnce: $isViewOnce, isDeleted: $isDeleted, createdAt: $createdAt, updatedAt: $updatedAt, viewedAt: $viewedAt, deletedAt: $deletedAt, reactions: $reactions)';
+      'Message(id: $id, chatId: $chatId, senderId: $senderId, messageType: $messageType, content: $content, replyToMessageId: $replyToMessageId, isViewOnce: $isViewOnce, isDeleted: $isDeleted, createdAt: $createdAt, updatedAt: $updatedAt, deletedAt: $deletedAt)';
 
   @override
   bool operator ==(covariant Message other) {
@@ -135,9 +114,7 @@ class Message {
         other.isDeleted == isDeleted &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt &&
-        other.viewedAt == viewedAt &&
-        other.deletedAt == deletedAt &&
-        listEquals(other.reactions, reactions);
+        other.deletedAt == deletedAt;
   }
 
   @override
@@ -152,7 +129,5 @@ class Message {
       isDeleted.hashCode ^
       createdAt.hashCode ^
       updatedAt.hashCode ^
-      viewedAt.hashCode ^
-      deletedAt.hashCode ^
-      reactions.hashCode;
+      deletedAt.hashCode;
 }

@@ -1,7 +1,7 @@
 // ignore_for_file: unnecessary_lambdas
 
 import '../models/message.dart';
-import '../models/reaction.dart';
+import '../models/message_user_status.dart';
 import 'logger_service.dart';
 import 'supabase_service.dart';
 
@@ -22,19 +22,19 @@ class MessagesTableService {
       );
 
   /// Stream message `reactions`
-  Stream<List<Reaction>?> streamMessageReactions({
+  Stream<List<MessageUserStatus>?> streamMessageReactions({
     required String messageId,
   }) =>
       supabase.from('reactions').stream(primaryKey: ['id']).eq('message_id', messageId).order('created_at').map(
-            (data) => data.isNotEmpty ? data.map((json) => Reaction.fromMap(json)).toList() : null,
+            (data) => data.isNotEmpty ? data.map((json) => MessageUserStatus.fromMap(json)).toList() : null,
           );
 
   ///
   /// MESSAGES
   ///
 
-  /// Store `message` in [Supabase]
-  Future<Message?> sendMessage({
+  /// Send `message`
+  Future<Message?> createMessage({
     required String chatId,
     required String content,
     required MessageType messageType,
@@ -48,8 +48,6 @@ class MessagesTableService {
         throw Exception('Not authenticated');
       }
 
-      final now = DateTime.now();
-
       final message = Message(
         chatId: chatId,
         senderId: userId,
@@ -58,7 +56,7 @@ class MessagesTableService {
         replyToMessageId: replyToMessageId,
         isViewOnce: isViewOnce,
         isDeleted: false,
-        createdAt: now,
+        createdAt: DateTime.now(),
       );
 
       final messageResponse = await supabase.from('messages').insert(message.toMap()).select().maybeSingle();
@@ -66,20 +64,20 @@ class MessagesTableService {
       if (messageResponse != null) {
         final parsedMessage = Message.fromMap(messageResponse);
 
-        logger.t('MessagesTableService -> _sendMessage() -> success!');
+        logger.t('MessagesTableService -> createMessage() -> success!');
         return parsedMessage;
       } else {
-        logger.e('MessagesTableService -> _sendMessage() -> messageResponse == null');
+        logger.e('MessagesTableService -> createMessage() -> messageResponse == null');
         return null;
       }
     } catch (e) {
-      logger.e('MessagesTableService -> _sendMessage() -> $e');
+      logger.e('MessagesTableService -> createMessage() -> $e');
       return null;
     }
   }
 
   /// Edit a `message`
-  Future<Message?> editMessage({
+  Future<Message?> updateMessage({
     required String messageId,
     required String newContent,
   }) async {
@@ -90,49 +88,35 @@ class MessagesTableService {
         throw Exception('Not authenticated');
       }
 
-      /// Get existing `message`
-      final messageResponse = await supabase.from('messages').select().eq('id', messageId).maybeSingle();
+      /// Update `message`
+      final messageResponse = await supabase
+          .from('messages')
+          .update({
+            'content': newContent,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', messageId)
+          .eq('sender_id', userId) // Ensure user owns message
+          .select()
+          .maybeSingle();
 
       if (messageResponse != null) {
         final message = Message.fromMap(messageResponse);
 
-        /// Verify ownership
-        if (message.senderId != userId) {
-          throw Exception('Cannot edit message from another user');
-        }
-
-        // Update message
-        final updatedMessageResponse = await supabase
-            .from('messages')
-            .update({
-              'content': newContent,
-              'updated_at': DateTime.now().toIso8601String(),
-            })
-            .eq('id', messageId)
-            .select()
-            .maybeSingle();
-
-        if (updatedMessageResponse != null) {
-          final updatedMessage = Message.fromMap(updatedMessageResponse);
-
-          logger.t('MessagesTableService -> editMessage() -> success!');
-          return updatedMessage;
-        } else {
-          logger.e('MessagesTableService -> editMessage() -> updatedMessageResponse == null');
-          return null;
-        }
+        logger.t('MessagesTableService -> updateMessage() -> success!');
+        return message;
       } else {
-        logger.e('MessagesTableService -> editMessage() -> messageResponse == null');
+        logger.e('MessagesTableService -> updateMessage() -> messageResponse == null');
         return null;
       }
     } catch (e) {
-      logger.e('MessagesTableService -> editMessage() -> $e');
+      logger.e('MessagesTableService -> updateMessage() -> $e');
       return null;
     }
   }
 
   /// Delete a `message`
-  Future<bool> deleteMessage({required String messageId}) async {
+  Future<Message?> deleteMessage({required String messageId}) async {
     try {
       final userId = supabase.auth.currentUser?.id;
 
@@ -140,20 +124,30 @@ class MessagesTableService {
         throw Exception('Not authenticated');
       }
 
-      await supabase
+      /// Delete `message`
+      final messageResponse = await supabase
           .from('messages')
           .update({
             'is_deleted': true,
             'deleted_at': DateTime.now().toIso8601String(),
           })
           .eq('id', messageId)
-          .eq('sender_id', userId); // Ensure user owns message
+          .eq('sender_id', userId) // Ensure user owns message
+          .select()
+          .maybeSingle();
 
-      logger.t('MessagesTableService -> deleteMessage() -> success!');
-      return true;
+      if (messageResponse != null) {
+        final message = Message.fromMap(messageResponse);
+
+        logger.t('MessagesTableService -> deleteMessage() -> success!');
+        return message;
+      } else {
+        logger.e('MessagesTableService -> deleteMessage() -> messageResponse == null');
+        return null;
+      }
     } catch (e) {
       logger.e('MessagesTableService -> deleteMessage() -> $e');
-      return false;
+      return null;
     }
   }
 
@@ -162,7 +156,7 @@ class MessagesTableService {
   ///
 
   /// Add `reaction` to `message`
-  Future<bool> addReaction({
+  Future<bool> createReaction({
     required String messageId,
     required String reaction,
   }) async {
@@ -174,7 +168,7 @@ class MessagesTableService {
       }
 
       await supabase.from('reactions').upsert(
-            Reaction(
+            MessageUserStatus(
               userId: userId,
               messageId: messageId,
               reaction: reaction,
@@ -182,10 +176,10 @@ class MessagesTableService {
             ).toMap(),
           );
 
-      logger.t('MessagesTableService -> addReaction() -> success!');
+      logger.t('MessagesTableService -> createReaction() -> success!');
       return true;
     } catch (e) {
-      logger.e('MessagesTableService -> addReaction() -> $e');
+      logger.e('MessagesTableService -> createReaction() -> $e');
       return false;
     }
   }

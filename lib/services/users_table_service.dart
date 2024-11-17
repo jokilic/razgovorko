@@ -73,7 +73,7 @@ class UsersTableService {
     DateTime? dateOfBirth,
   }) async {
     if (supabaseUser.email == null) {
-      logger.e('UsersTableService -> storeUserDataInDatabase() -> supabaseUser.email == null');
+      logger.e('UsersTableService -> createUserProfile() -> supabaseUser.email == null');
       return null;
     }
 
@@ -103,14 +103,14 @@ class UsersTableService {
       if (userResponse != null) {
         final parsedUser = RazgovorkoUser.fromMap(userResponse);
 
-        logger.t('UsersTableService -> storeUserDataInDatabase() -> success!');
+        logger.t('UsersTableService -> createUserProfile() -> success!');
         return parsedUser;
       } else {
-        logger.e('UsersTableService -> storeUserDataInDatabase() -> userResponse == null');
+        logger.e('UsersTableService -> createUserProfile() -> userResponse == null');
         return null;
       }
     } catch (e) {
-      logger.e('UsersTableService -> storeUserDataInDatabase() -> $e');
+      logger.e('UsersTableService -> createUserProfile() -> $e');
       return null;
     }
   }
@@ -248,10 +248,10 @@ class UsersTableService {
         'is_online': false,
       }).eq('id', userId);
 
-      logger.t('UsersTableService -> deleteAccount() -> success!');
+      logger.t('UsersTableService -> deleteUserProfile() -> success!');
       return true;
     } catch (e) {
-      logger.e('UsersTableService -> deleteAccount() -> $e');
+      logger.e('UsersTableService -> deleteUserProfile() -> $e');
       return false;
     }
   }

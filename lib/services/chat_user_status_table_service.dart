@@ -13,37 +13,41 @@ class ChatUserStatusTableService {
   /// STREAMS
   ///
 
-  /// Stream typing users
-  Stream<List<String>> streamTypingUsers({required String chatId}) {
+  /// Stream typing `userIds`
+  Stream<List<String>> streamTypingUserIds({required String chatId}) {
     final userId = supabase.auth.currentUser?.id;
 
     if (userId == null) {
       throw Exception('Not authenticated');
     }
 
-    return supabase
-        .from('chat_user_status')
-        .stream(primaryKey: ['id'])
-        .eq('chat_id', chatId)
-        .map((rows) => rows.where((row) => row['user_id'] != supabase.auth.currentUser!.id && row['is_typing'] == true).map((row) => row['user_id'] as String).toList());
+    return supabase.from('chat_user_status').stream(primaryKey: ['id']).eq('chat_id', chatId).map(
+          (rows) => rows.where((row) => row['user_id'] != userId && row['is_typing'] == true).map((row) => row['user_id'] as String).toList(),
+        );
   }
 
-  /// Stream unread counts for all chats
-  Stream<Map<String, int>> streamUnreadCounts({required List<String> chatIds}) {
+  /// Stream unread counts for all `chats`
+  Stream<Map<String, int>?> streamUnreadCounts({required List<String> chatIds}) {
     if (chatIds.isEmpty) {
-      return Stream.value({});
+      return Stream.value(null);
     }
 
-    return supabase.from('messages').stream(primaryKey: ['id']).map((_) async {
-      final counts = <String, int>{};
-      for (final chatId in chatIds) {
-        counts[chatId] = await getUnreadCount(
-              chatId: chatId,
-            ) ??
-            0;
-      }
-      return counts;
-    }).asyncMap((future) => future);
+    return supabase.from('messages').stream(primaryKey: ['id']).map(
+      (_) async {
+        final counts = <String, int>{};
+
+        for (final chatId in chatIds) {
+          counts[chatId] = await getUnreadCount(
+                chatId: chatId,
+              ) ??
+              0;
+        }
+
+        return counts;
+      },
+    ).asyncMap(
+      (future) => future,
+    );
   }
 
   ///
@@ -142,7 +146,7 @@ class ChatUserStatusTableService {
     }
   }
 
-  /// When user types
+  /// When `user` types
   Future<bool> updateTypingStatus({
     required String chatId,
     required bool isTyping,
@@ -154,25 +158,12 @@ class ChatUserStatusTableService {
         throw Exception('Not authenticated');
       }
 
-      // Only update if status actually changed
-      // if (_isCurrentlyTyping == isTyping) return;
-
-      // _isCurrentlyTyping = isTyping;
-
       await supabase.from('chat_user_status').upsert({
         'user_id': userId,
         'chat_id': chatId,
         'is_typing': isTyping,
         if (isTyping) 'last_typed_at': DateTime.now().toIso8601String(),
       });
-
-      // If starting to type, set timer to automatically stop
-      // if (isTyping) {
-      //   _typingTimer?.cancel();
-      //   _typingTimer = Timer(const Duration(seconds: 5), () {
-      //     updateTypingStatus(chatId, isTyping: false);
-      //   });
-      // }
 
       logger.t('ChatUserStatusTableService -> updateTypingStatus() -> success!');
       return true;
@@ -217,14 +208,10 @@ class ChatUserStatusTableService {
         throw Exception('Not authenticated');
       }
 
-      // _isCurrentlyTyping = false;
-      // _typingTimer?.cancel();
-
       await supabase
           .from('chat_user_status')
           .update({
             'left_at': DateTime.now().toIso8601String(),
-            'is_typing': false,
           })
           .eq('user_id', userId)
           .eq('chat_id', chatId);
@@ -246,7 +233,7 @@ class ChatUserStatusTableService {
         throw Exception('Not authenticated');
       }
 
-      final status = await supabase.from('chat_user_status').select('last_read_at').eq('user_id', supabase.auth.currentUser!.id).eq('chat_id', chatId).maybeSingle();
+      final status = await supabase.from('chat_user_status').select('last_read_at').eq('user_id', userId).eq('chat_id', chatId).maybeSingle();
 
       if (status != null) {
         final lastReadAt = status['last_read_at'] as String?;

@@ -1,38 +1,42 @@
-class Reaction {
+class MessageUserStatus {
   final String id;
   final String userId;
   final String messageId;
-  final String reaction;
+  final String? reaction;
   final DateTime createdAt;
   final DateTime? updatedAt;
+  final DateTime? viewedAt;
   final DateTime? deletedAt;
 
-  Reaction({
+  MessageUserStatus({
     required this.userId,
     required this.messageId,
-    required this.reaction,
     required this.createdAt,
     this.id = '', // ID should be handled by Supabase
+    this.reaction,
     this.updatedAt,
+    this.viewedAt,
     this.deletedAt,
   });
 
-  Reaction copyWith({
+  MessageUserStatus copyWith({
     String? id,
     String? userId,
     String? messageId,
     String? reaction,
     DateTime? createdAt,
     DateTime? updatedAt,
+    DateTime? viewedAt,
     DateTime? deletedAt,
   }) =>
-      Reaction(
+      MessageUserStatus(
         id: id ?? this.id,
         userId: userId ?? this.userId,
         messageId: messageId ?? this.messageId,
         reaction: reaction ?? this.reaction,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
+        viewedAt: viewedAt ?? this.viewedAt,
         deletedAt: deletedAt ?? this.deletedAt,
       );
 
@@ -43,24 +47,27 @@ class Reaction {
         'reaction': reaction,
         'created_at': createdAt.toIso8601String(),
         'updated_at': updatedAt?.toIso8601String(),
+        'viewed_at': viewedAt?.toIso8601String(),
         'deleted_at': deletedAt?.toIso8601String(),
       };
 
-  factory Reaction.fromMap(Map<String, dynamic> map) => Reaction(
+  factory MessageUserStatus.fromMap(Map<String, dynamic> map) => MessageUserStatus(
         id: map['id'] as String,
         userId: map['user_id'] as String,
         messageId: map['message_id'] as String,
-        reaction: map['reaction'] as String,
+        reaction: map['reaction'] != null ? map['reaction'] as String : null,
         createdAt: DateTime.parse(map['created_at']),
         updatedAt: map['updated_at'] != null ? DateTime.parse(map['updated_at']) : null,
+        viewedAt: map['viewed_at'] != null ? DateTime.parse(map['viewed_at']) : null,
         deletedAt: map['deleted_at'] != null ? DateTime.parse(map['deleted_at']) : null,
       );
 
   @override
-  String toString() => 'Reaction(id: $id, userId: $userId, messageId: $messageId, reaction: $reaction, createdAt: $createdAt, updatedAt: $updatedAt, deletedAt: $deletedAt)';
+  String toString() =>
+      'MessageUserStatus(id: $id, userId: $userId, messageId: $messageId, reaction: $reaction, createdAt: $createdAt, updatedAt: $updatedAt, viewedAt: $viewedAt, deletedAt: $deletedAt)';
 
   @override
-  bool operator ==(covariant Reaction other) {
+  bool operator ==(covariant MessageUserStatus other) {
     if (identical(this, other)) {
       return true;
     }
@@ -71,9 +78,10 @@ class Reaction {
         other.reaction == reaction &&
         other.createdAt == createdAt &&
         other.updatedAt == updatedAt &&
+        other.viewedAt == viewedAt &&
         other.deletedAt == deletedAt;
   }
 
   @override
-  int get hashCode => id.hashCode ^ userId.hashCode ^ messageId.hashCode ^ reaction.hashCode ^ createdAt.hashCode ^ updatedAt.hashCode ^ deletedAt.hashCode;
+  int get hashCode => id.hashCode ^ userId.hashCode ^ messageId.hashCode ^ reaction.hashCode ^ createdAt.hashCode ^ updatedAt.hashCode ^ viewedAt.hashCode ^ deletedAt.hashCode;
 }

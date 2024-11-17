@@ -161,7 +161,7 @@ class ConversationController extends ValueNotifier<RazgovorkoState<String>> impl
       final messageText = messageController.text.trim();
 
       /// Try to send message
-      final message = await messagesTable.sendMessage(
+      final message = await messagesTable.createMessage(
         chatId: chatId,
         content: messageText,
         messageType: MessageType.text,
