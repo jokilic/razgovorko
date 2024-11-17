@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../dependencies.dart';
 import '../screens/chat/chat_screen.dart';
 import '../screens/login/login_screen.dart';
-import '../services/supabase_service.dart';
+import '../services/auth_service.dart';
 
 class AuthGuard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         body: StreamBuilder(
-          stream: supabase.auth.onAuthStateChange,
+          stream: getIt.get<AuthService>().onAuthStateChange(),
           builder: (context, authStateSnapshot) {
             ///
             /// LOADING

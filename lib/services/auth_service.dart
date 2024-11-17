@@ -11,6 +11,12 @@ class AuthService {
   });
 
   ///
+  /// STREAMS
+  ///
+
+  Stream<AuthState> onAuthStateChange() => supabase.auth.onAuthStateChange;
+
+  ///
   /// METHODS
   ///
 
