@@ -41,30 +41,14 @@ class MessageUserStatusTableService {
 
       final now = DateTime.now();
 
-      /// Fetch existing [MessageUserStatus]
-      final existingStatusResponse = await supabase.from('message_user_status').select().eq('message_id', messageId).eq('user_id', userId).maybeSingle();
+      await supabase.from('message_user_status').update({
+        'reaction': reaction,
+        'updated_at': now.toIso8601String(),
+        if (reaction == null) 'deleted_at': now.toIso8601String(),
+      });
 
-      if (existingStatusResponse != null) {
-        final existingStatus = MessageUserStatus.fromMap(existingStatusResponse);
-
-        await supabase.from('message_user_status').upsert(
-              existingStatus
-                  .copyWith(
-                    userId: userId,
-                    messageId: messageId,
-                    reaction: reaction,
-                    updatedAt: now,
-                    deletedAt: reaction == null ? now : null,
-                  )
-                  .toMap(),
-            );
-
-        logger.t('MessageUserStatusService -> updateReaction() -> success!');
-        return true;
-      } else {
-        logger.e('MessageUserStatusService -> updateReaction() -> existingStatusResponse == null');
-        return false;
-      }
+      logger.t('MessageUserStatusService -> updateReaction() -> success!');
+      return true;
     } catch (e) {
       logger.e('MessageUserStatusService -> updateReaction() -> $e');
       return false;
@@ -82,29 +66,13 @@ class MessageUserStatusTableService {
 
       final now = DateTime.now();
 
-      /// Fetch existing [MessageUserStatus]
-      final existingStatusResponse = await supabase.from('message_user_status').select().eq('message_id', messageId).eq('user_id', userId).maybeSingle();
+      await supabase.from('message_user_status').update({
+        'viewed_at': now.toIso8601String(),
+        'updated_at': now.toIso8601String(),
+      });
 
-      if (existingStatusResponse != null) {
-        final existingStatus = MessageUserStatus.fromMap(existingStatusResponse);
-
-        await supabase.from('message_user_status').upsert(
-              existingStatus
-                  .copyWith(
-                    userId: userId,
-                    messageId: messageId,
-                    viewedAt: now,
-                    updatedAt: now,
-                  )
-                  .toMap(),
-            );
-
-        logger.t('MessageUserStatusService -> markAsViewed() -> success!');
-        return true;
-      } else {
-        logger.e('MessageUserStatusService -> markAsViewed() -> existingStatusResponse == null');
-        return false;
-      }
+      logger.t('MessageUserStatusService -> markAsViewed() -> success!');
+      return true;
     } catch (e) {
       logger.e('MessageUserStatusService -> markAsViewed() -> $e');
       return false;

@@ -98,7 +98,7 @@ class UsersTableService {
       );
 
       /// Insert into `users` table
-      final userResponse = await supabase.from('users').upsert(user.toMap()).select().maybeSingle();
+      final userResponse = await supabase.from('users').insert(user.toMap()).select().maybeSingle();
 
       if (userResponse != null) {
         final parsedUser = RazgovorkoUser.fromMap(userResponse);

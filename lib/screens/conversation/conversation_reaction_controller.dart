@@ -29,7 +29,7 @@ class ConversationReactionController {
     required String messageId,
     required String reaction,
   }) =>
-      messagesTable.removeReaction(
+      messagesTable.deleteReaction(
         messageId: messageId,
         reaction: reaction,
       );

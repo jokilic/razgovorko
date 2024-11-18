@@ -11,6 +11,7 @@ import '../../services/chat_user_status_table_service.dart';
 import '../../services/chats_table_service.dart';
 import '../../services/logger_service.dart';
 import '../../services/messages_table_service.dart';
+import '../../services/supabase_service.dart';
 import '../../util/state.dart';
 import 'conversation_controller.dart';
 import 'conversation_management_controller.dart';
@@ -99,115 +100,129 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 40,
-            vertical: 24,
-          ),
-          child: switch (conversationState) {
-            Initial() => Container(
-                color: Colors.grey,
-              ),
-            Loading() => Container(
-                color: Colors.yellow,
-              ),
-            Empty() => Container(
-                color: Colors.cyan,
-              ),
-            Error(error: final error) => Container(
-                color: Colors.red,
-                child: Text(error ?? 'no_error'),
-              ),
-            Success(data: final chatId) => Column(
-                children: [
-                  ///
-                  /// MESSAGES
-                  ///
-                  Expanded(
-                    child: StreamBuilder(
-                      stream: controller.streamMessages(
-                        chatId: chatId,
-                      ),
-                      builder: (context, messagesSnapshot) {
-                        ///
-                        /// LOADING
-                        ///
-                        if (messagesSnapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-
-                        ///
-                        /// ERROR
-                        ///
-                        if (messagesSnapshot.hasError) {
-                          return Text(
-                            messagesSnapshot.error.toString(),
-                          );
-                        }
-
-                        ///
-                        /// SUCCESS
-                        ///
-                        if (messagesSnapshot.hasData) {
-                          final messages = messagesSnapshot.data;
-
-                          return ListView.builder(
-                            itemCount: messages?.length ?? 0,
-                            physics: const BouncingScrollPhysics(),
-                            itemBuilder: (_, index) {
-                              final message = messages![index];
-
-                              return ListTile(
-                                title: Text(
-                                  message.content,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                subtitle: Text(
-                                  message.createdAt.toIso8601String(),
-                                ),
-                                leading: const CircleAvatar(
-                                  radius: 24,
-                                  backgroundColor: Colors.deepPurple,
-                                  child: Icon(
-                                    Icons.message_rounded,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        }
-
-                        return const Text(
-                          "This shouldn't happen",
-                        );
-                      },
-                    ),
-                  ),
-
-                  ///
-                  /// TEXT FIELD
-                  ///
-                  TextField(
-                    onSubmitted: (_) => sendController.sendMessage(
+        child: switch (conversationState) {
+          Initial() => Container(
+              color: Colors.grey,
+            ),
+          Loading() => Container(
+              color: Colors.yellow,
+            ),
+          Empty() => Container(
+              color: Colors.cyan,
+            ),
+          Error(error: final error) => Container(
+              color: Colors.red,
+              child: Text(error ?? 'no_error'),
+            ),
+          Success(data: final chatId) => Column(
+              children: [
+                ///
+                /// MESSAGES
+                ///
+                Expanded(
+                  child: StreamBuilder(
+                    stream: controller.streamMessages(
                       chatId: chatId,
-                      messageType: MessageType.text,
-                      messageController: controller.messageController,
                     ),
-                    controller: controller.messageController,
-                    decoration: const InputDecoration(
-                      labelText: 'Message...',
-                    ),
+                    builder: (context, messagesSnapshot) {
+                      ///
+                      /// LOADING
+                      ///
+                      if (messagesSnapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+
+                      ///
+                      /// ERROR
+                      ///
+                      if (messagesSnapshot.hasError) {
+                        return Text(
+                          messagesSnapshot.error.toString(),
+                        );
+                      }
+
+                      ///
+                      /// SUCCESS
+                      ///
+                      if (messagesSnapshot.hasData) {
+                        final messages = messagesSnapshot.data;
+
+                        return ListView.builder(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 16,
+                          ),
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: messages?.length ?? 0,
+                          itemBuilder: (_, index) {
+                            final message = messages![index];
+
+                            final isMe = message.senderId == supabase.auth.currentUser?.id;
+
+                            return ListTile(
+                              title: Text(
+                                message.content,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: isMe ? TextAlign.left : TextAlign.right,
+                              ),
+                              subtitle: Text(
+                                message.createdAt.toIso8601String(),
+                                textAlign: isMe ? TextAlign.left : TextAlign.right,
+                              ),
+                              leading: isMe
+                                  ? const CircleAvatar(
+                                      radius: 24,
+                                      backgroundColor: Colors.green,
+                                      child: Icon(
+                                        Icons.person_rounded,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : null,
+                              trailing: !isMe
+                                  ? const CircleAvatar(
+                                      radius: 24,
+                                      backgroundColor: Colors.blue,
+                                      child: Icon(
+                                        Icons.person_rounded,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : null,
+                            );
+                          },
+                        );
+                      }
+
+                      return const Text(
+                        "This shouldn't happen",
+                      );
+                    },
                   ),
-                ],
-              ),
-          },
-        ),
+                ),
+
+                ///
+                /// TEXT FIELD
+                ///
+                TextField(
+                  onSubmitted: (_) => sendController.sendMessage(
+                    chatId: chatId,
+                    messageType: MessageType.text,
+                    messageController: controller.messageController,
+                  ),
+                  controller: controller.messageController,
+                  decoration: const InputDecoration(
+                    labelText: 'Message...',
+                  ),
+                ),
+              ],
+            ),
+        },
       ),
     );
   }

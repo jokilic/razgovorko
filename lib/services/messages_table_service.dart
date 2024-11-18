@@ -174,7 +174,7 @@ class MessagesTableService {
         createdAt: DateTime.now(),
       );
 
-      await supabase.from('reactions').upsert(
+      await supabase.from('reactions').insert(
             newReaction.toMap(),
           );
 
@@ -187,7 +187,7 @@ class MessagesTableService {
   }
 
   /// Remove reaction from message
-  Future<bool> removeReaction({
+  Future<bool> deleteReaction({
     required String messageId,
     required String reaction,
   }) async {
@@ -200,10 +200,10 @@ class MessagesTableService {
 
       await supabase.from('reactions').delete().eq('message_id', messageId).eq('user_id', userId).eq('reaction', reaction);
 
-      logger.t('MessagesTableService -> removeReaction() -> success!');
+      logger.t('MessagesTableService -> deleteReaction() -> success!');
       return true;
     } catch (e) {
-      logger.e('MessagesTableService -> removeReaction() -> $e');
+      logger.e('MessagesTableService -> deleteReaction() -> $e');
       return false;
     }
   }

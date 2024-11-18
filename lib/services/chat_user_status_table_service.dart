@@ -79,7 +79,7 @@ class ChatUserStatusTableService {
               joinedAt: DateTime.now(),
             );
 
-            return supabase.from('chat_user_status').upsert(
+            return supabase.from('chat_user_status').insert(
                   chatUserStatus.toMap(),
                 );
           },
@@ -135,28 +135,16 @@ class ChatUserStatusTableService {
         throw Exception('Not authenticated');
       }
 
-      /// Fetch existing [ChatUserStatus]
-      final existingStatusResponse = await supabase.from('chat_user_status').select().eq('chat_id', chatId).eq('user_id', userId).maybeSingle();
+      await supabase
+          .from('chat_user_status')
+          .update({
+            'is_typing': isTyping,
+          })
+          .eq('chat_id', chatId)
+          .eq('user_id', userId);
 
-      if (existingStatusResponse != null) {
-        final existingStatus = ChatUserStatus.fromMap(existingStatusResponse);
-
-        await supabase.from('chat_user_status').upsert(
-              existingStatus
-                  .copyWith(
-                    userId: userId,
-                    chatId: chatId,
-                    isTyping: isTyping,
-                  )
-                  .toMap(),
-            );
-
-        logger.t('ChatUserStatusTableService -> updateTypingStatus() -> success!');
-        return true;
-      } else {
-        logger.e('ChatUserStatusTableService -> updateTypingStatus() -> existingStatusResponse == null');
-        return false;
-      }
+      logger.t('ChatUserStatusTableService -> updateTypingStatus() -> success!');
+      return true;
     } catch (e) {
       logger.e('ChatUserStatusTableService -> updateTypingStatus() -> $e');
       return false;
@@ -175,29 +163,17 @@ class ChatUserStatusTableService {
         throw Exception('Not authenticated');
       }
 
-      /// Fetch existing [ChatUserStatus]
-      final existingStatusResponse = await supabase.from('chat_user_status').select().eq('chat_id', chatId).eq('user_id', userId).maybeSingle();
+      await supabase
+          .from('chat_user_status')
+          .update({
+            'last_read_message_id': lastMessageId,
+            'last_read_at': DateTime.now().toIso8601String(),
+          })
+          .eq('chat_id', chatId)
+          .eq('user_id', userId);
 
-      if (existingStatusResponse != null) {
-        final existingStatus = ChatUserStatus.fromMap(existingStatusResponse);
-
-        await supabase.from('chat_user_status').upsert(
-              existingStatus
-                  .copyWith(
-                    userId: userId,
-                    chatId: chatId,
-                    lastReadMessageId: lastMessageId,
-                    lastReadAt: DateTime.now(),
-                  )
-                  .toMap(),
-            );
-
-        logger.t('ChatUserStatusTableService -> markChatAsRead() -> success!');
-        return true;
-      } else {
-        logger.e('ChatUserStatusTableService -> updateTypingStatus() -> existingStatusResponse == null');
-        return false;
-      }
+      logger.t('ChatUserStatusTableService -> markChatAsRead() -> success!');
+      return true;
     } catch (e) {
       logger.e('ChatUserStatusTableService -> markChatAsRead() -> $e');
       return false;
@@ -218,7 +194,7 @@ class ChatUserStatusTableService {
 
       await supabase
           .from('chat_user_status')
-          .upsert({
+          .update({
             'is_muted': isMuted,
           })
           .eq('user_id', userId)
