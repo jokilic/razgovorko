@@ -3,7 +3,6 @@ import 'package:get_it/get_it.dart';
 
 import '../../models/chat.dart';
 import '../../models/message.dart';
-import '../../services/auth_service.dart';
 import '../../services/chat_user_status_table_service.dart';
 import '../../services/chats_table_service.dart';
 import '../../services/logger_service.dart';
@@ -13,14 +12,12 @@ import '../../util/state.dart';
 
 class ConversationController extends ValueNotifier<RazgovorkoState<String>> implements Disposable {
   final LoggerService logger;
-  final AuthService auth;
   final ChatsTableService chatsTable;
   final ChatUserStatusTableService chatUserStatusTable;
   final MessagesTableService messagesTable;
 
   ConversationController({
     required this.logger,
-    required this.auth,
     required this.chatsTable,
     required this.chatUserStatusTable,
     required this.messagesTable,
@@ -40,6 +37,13 @@ class ConversationController extends ValueNotifier<RazgovorkoState<String>> impl
   void onDispose() {
     messageController.dispose();
   }
+
+  ///
+  /// STREAMS
+  ///
+
+  /// Returns a [Stream] which listens `List<Message>` within the `messages` table
+  Stream<List<Message>?> streamMessages({required String chatId}) => messagesTable.streamMessages(chatId: chatId);
 
   ///
   /// METHODS
@@ -69,12 +73,14 @@ class ConversationController extends ValueNotifier<RazgovorkoState<String>> impl
 
       /// `chatId` isn't fetched
       else {
-        value = Error(error: "chatId isn't fetched");
-        logger.e("ConversationController -> init() -> chatId isn't fetched");
+        const error = 'ConversationController -> init() -> chatId == null';
+        value = Error(error: error);
+        logger.e(error);
       }
     } catch (e) {
-      value = Error(error: '$e');
-      logger.e('ConversationController -> init() -> $e');
+      final error = 'ConversationController -> init() -> $e';
+      value = Error(error: error);
+      logger.e(error);
     }
   }
 
@@ -138,51 +144,23 @@ class ConversationController extends ValueNotifier<RazgovorkoState<String>> impl
     }
   }
 
-  /// Returns a [Stream] which listens `List<Message>` within the `messages` table
-  Stream<List<Message>?> streamMessages({required String chatId}) => messagesTable.streamMessages(chatId: chatId);
-
-  /// Triggered when the user sends a message
-  Future<bool> sendMessage({
+  /// Mark `chat` as read
+  Future<void> markChatAsRead({
     required String chatId,
-  }) async {
-    try {
-      /// Don't send message if there is no `chatId`
-      if (value is! Success) {
-        logger.e('ConversationController -> sendMessage() -> no chatId');
-        return false;
-      }
-
-      /// Don't send message if `message` is empty
-      if (messageController.text.trim().isEmpty) {
-        logger.e('ConversationController -> sendMessage() -> message is empty');
-        return false;
-      }
-
-      final messageText = messageController.text.trim();
-
-      /// Try to send message
-      final message = await messagesTable.createMessage(
+    required String lastMessageId,
+  }) =>
+      chatUserStatusTable.markChatAsRead(
         chatId: chatId,
-        content: messageText,
-        messageType: MessageType.text,
-        isViewOnce: false,
+        lastMessageId: lastMessageId,
       );
 
-      /// Message sent successfully, clear `messageController`
-      if (message != null) {
-        messageController.clear();
-        logger.t('ConversationController -> sendMessage() -> success!');
-        return true;
-      }
-
-      /// Message failed to send
-      else {
-        logger.e('ConversationController -> sendMessage() -> messageSent is false');
-        return false;
-      }
-    } catch (e) {
-      logger.e('ConversationController -> sendMessage() -> $e');
-      return false;
-    }
-  }
+  /// Mute `chat`
+  Future<void> muteChat({
+    required String chatId,
+    required bool isMuted,
+  }) =>
+      chatUserStatusTable.updateMuteSettings(
+        chatId: chatId,
+        isMuted: isMuted,
+      );
 }

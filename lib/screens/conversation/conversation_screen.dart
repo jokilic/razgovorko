@@ -4,13 +4,16 @@ import 'package:watch_it/watch_it.dart';
 import '../../dependencies.dart';
 import '../../models/chat.dart';
 import '../../models/user.dart';
-import '../../services/auth_service.dart';
 import '../../services/chat_user_status_table_service.dart';
 import '../../services/chats_table_service.dart';
 import '../../services/logger_service.dart';
 import '../../services/messages_table_service.dart';
 import '../../util/state.dart';
 import 'conversation_controller.dart';
+import 'conversation_management_controller.dart';
+import 'conversation_reaction_controller.dart';
+import 'conversation_send_controller.dart';
+import 'conversation_typing_controller.dart';
 
 class ConversationScreen extends WatchingStatefulWidget {
   final RazgovorkoUser otherUser;
@@ -28,10 +31,35 @@ class _ConversationScreenState extends State<ConversationScreen> {
   void initState() {
     super.initState();
 
+    registerIfNotInitialized<ConversationSendController>(
+      () => ConversationSendController(
+        logger: getIt.get<LoggerService>(),
+        chatUserStatusTable: getIt.get<ChatUserStatusTableService>(),
+        messagesTable: getIt.get<MessagesTableService>(),
+      ),
+    );
+    registerIfNotInitialized<ConversationTypingController>(
+      () => ConversationTypingController(
+        logger: getIt.get<LoggerService>(),
+        chatUserStatusTable: getIt.get<ChatUserStatusTableService>(),
+      ),
+    );
+    registerIfNotInitialized<ConversationManagementController>(
+      () => ConversationManagementController(
+        logger: getIt.get<LoggerService>(),
+        chatsTable: getIt.get<ChatsTableService>(),
+        chatUserStatusTable: getIt.get<ChatUserStatusTableService>(),
+      ),
+    );
+    registerIfNotInitialized<ConversationReactionController>(
+      () => ConversationReactionController(
+        logger: getIt.get<LoggerService>(),
+        messagesTable: getIt.get<MessagesTableService>(),
+      ),
+    );
     registerIfNotInitialized<ConversationController>(
       () => ConversationController(
         logger: getIt.get<LoggerService>(),
-        auth: getIt.get<AuthService>(),
         chatsTable: getIt.get<ChatsTableService>(),
         chatUserStatusTable: getIt.get<ChatUserStatusTableService>(),
         messagesTable: getIt.get<MessagesTableService>(),
@@ -45,14 +73,19 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   @override
   void dispose() {
-    getIt.unregister<ConversationController>();
+    getIt
+      ..unregister<ConversationSendController>()
+      ..unregister<ConversationTypingController>()
+      ..unregister<ConversationManagementController>()
+      ..unregister<ConversationReactionController>()
+      ..unregister<ConversationController>();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final conversationState = watchIt<ConversationController>().value;
-    // final controller = getIt.get<ConversationController>();
 
     return Scaffold(
       body: SafeArea(

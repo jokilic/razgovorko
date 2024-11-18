@@ -39,7 +39,7 @@ class LoginController implements Disposable {
   /// METHODS
   ///
 
-  /// Triggered when pressing `Login` button
+  /// Signs `user` in [Supabase]
   Future<User?> signIn({
     required String email,
     required String password,
@@ -65,8 +65,8 @@ class LoginController implements Disposable {
     }
   }
 
-  /// Triggered when pressing `Register` button
-  Future<RazgovorkoUser?> signUpAndStoreUserInDatabase({
+  /// Registers `user` in [Supabase]
+  Future<User?> signUp({
     required String email,
     required String password,
   }) async {
@@ -79,18 +79,34 @@ class LoginController implements Disposable {
       final supabaseUser = authResponse?.user;
 
       if (supabaseUser != null) {
-        final razgovorkoUser = await usersTable.createUserProfile(
-          supabaseUser: supabaseUser,
-        );
-
-        logger.t('LoginController -> signUpAndStoreUserInDatabase() -> success!');
-        return razgovorkoUser;
+        logger.t('LoginController -> signUp() -> success!');
+        return supabaseUser;
       } else {
-        logger.e('LoginController -> signUpAndStoreUserInDatabase() -> supabaseUser == null');
+        logger.e('LoginController -> signUp() -> supabaseUser == null');
         return null;
       }
     } catch (e) {
-      logger.e('LoginController -> signUpAndStoreUserInDatabase() -> $e');
+      logger.e('LoginController -> signUp() -> $e');
+      return null;
+    }
+  }
+
+  /// Creates `user` in `users` table
+  Future<RazgovorkoUser?> createUser({required User supabaseUser}) async {
+    try {
+      final razgovorkoUser = await usersTable.createUserProfile(
+        supabaseUser: supabaseUser,
+      );
+
+      if (razgovorkoUser != null) {
+        logger.t('LoginController -> createUser() -> success!');
+        return razgovorkoUser;
+      } else {
+        logger.e('LoginController -> createUser() -> razgovorkoUser == null');
+        return null;
+      }
+    } catch (e) {
+      logger.e('LoginController -> createUser() -> $e');
       return null;
     }
   }

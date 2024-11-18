@@ -75,10 +75,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 32),
                 ElevatedButton.icon(
-                  onPressed: () => controller.signUpAndStoreUserInDatabase(
-                    email: controller.emailController.text.trim(),
-                    password: controller.passwordController.text.trim(),
-                  ),
+                  onPressed: () async {
+                    final supabaseUser = await controller.signUp(
+                      email: controller.emailController.text.trim(),
+                      password: controller.passwordController.text.trim(),
+                    );
+
+                    if (supabaseUser != null) {
+                      await controller.createUser(
+                        supabaseUser: supabaseUser,
+                      );
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(
                       double.infinity,

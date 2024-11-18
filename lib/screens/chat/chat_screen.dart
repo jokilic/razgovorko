@@ -9,6 +9,7 @@ import '../../services/logger_service.dart';
 import '../../services/messages_table_service.dart';
 import '../../services/users_table_service.dart';
 import 'chat_controller.dart';
+import 'chat_users_controller.dart';
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -20,6 +21,13 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
 
+    registerIfNotInitialized<ChatUsersController>(
+      () => ChatUsersController(
+        logger: getIt.get<LoggerService>(),
+        auth: getIt.get<AuthService>(),
+        usersTable: getIt.get<UsersTableService>(),
+      ),
+    );
     registerIfNotInitialized<ChatController>(
       () => ChatController(
         logger: getIt.get<LoggerService>(),
@@ -34,13 +42,16 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   void dispose() {
-    getIt.unregister<ChatController>();
+    getIt
+      ..unregister<ChatUsersController>()
+      ..unregister<ChatController>();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = getIt.get<ChatController>();
+    final usersController = getIt.get<ChatUsersController>();
 
     return Scaffold(
       body: SafeArea(
@@ -52,14 +63,14 @@ class _ChatScreenState extends State<ChatScreen> {
           child: Column(
             children: [
               StreamBuilder(
-                stream: controller.streamCurrentUser(),
+                stream: usersController.streamCurrentUser(),
                 builder: (context, userSnapshot) => Text(
                   userSnapshot.data?.email ?? 'No email',
                 ),
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(
-                onPressed: controller.signOut,
+                onPressed: usersController.signOut,
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(
                     double.infinity,
@@ -74,7 +85,7 @@ class _ChatScreenState extends State<ChatScreen> {
               const SizedBox(height: 24),
               Expanded(
                 child: StreamBuilder(
-                  stream: controller.streamAllUsers(),
+                  stream: usersController.streamAllUsers(),
                   builder: (context, usersSnapshot) {
                     ///
                     /// LOADING
