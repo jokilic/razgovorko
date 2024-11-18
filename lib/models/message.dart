@@ -67,7 +67,7 @@ class Message {
       );
 
   Map<String, dynamic> toMap() => <String, dynamic>{
-        'id': id,
+        // 'id': id,
         'chat_id': chatId,
         'sender_id': senderId,
         'message_type': messageType.name,

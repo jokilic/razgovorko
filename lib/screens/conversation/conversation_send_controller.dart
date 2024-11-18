@@ -23,6 +23,7 @@ class ConversationSendController {
   /// Triggered when the `user` sends a `message`
   Future<Message?> sendMessage({
     required String chatId,
+    required MessageType messageType,
     required TextEditingController messageController,
   }) async {
     try {
@@ -38,7 +39,7 @@ class ConversationSendController {
       final message = await messagesTable.createMessage(
         chatId: chatId,
         content: messageText,
-        messageType: MessageType.text,
+        messageType: messageType,
         isViewOnce: false,
       );
 

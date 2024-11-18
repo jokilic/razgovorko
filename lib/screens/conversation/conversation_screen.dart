@@ -1,8 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
 
 import '../../dependencies.dart';
 import '../../models/chat.dart';
+import '../../models/message.dart';
 import '../../models/user.dart';
 import '../../services/chat_user_status_table_service.dart';
 import '../../services/chats_table_service.dart';
@@ -85,9 +88,16 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = getIt.get<ConversationController>();
+    final sendController = getIt.get<ConversationSendController>();
     final conversationState = watchIt<ConversationController>().value;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Conversation with ${widget.otherUser.displayName}',
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -108,72 +118,97 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 color: Colors.red,
                 child: Text(error ?? 'no_error'),
               ),
-            Success(data: final data) => Container(
-                color: Colors.green,
-                child: Text(data),
+            Success(data: final chatId) => Column(
+                children: [
+                  ///
+                  /// MESSAGES
+                  ///
+                  Expanded(
+                    child: StreamBuilder(
+                      stream: controller.streamMessages(
+                        chatId: chatId,
+                      ),
+                      builder: (context, messagesSnapshot) {
+                        ///
+                        /// LOADING
+                        ///
+                        if (messagesSnapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        ///
+                        /// ERROR
+                        ///
+                        if (messagesSnapshot.hasError) {
+                          return Text(
+                            messagesSnapshot.error.toString(),
+                          );
+                        }
+
+                        ///
+                        /// SUCCESS
+                        ///
+                        if (messagesSnapshot.hasData) {
+                          final messages = messagesSnapshot.data;
+
+                          return ListView.builder(
+                            itemCount: messages?.length ?? 0,
+                            physics: const BouncingScrollPhysics(),
+                            itemBuilder: (_, index) {
+                              final message = messages![index];
+
+                              return ListTile(
+                                title: Text(
+                                  message.content,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  message.createdAt.toIso8601String(),
+                                ),
+                                leading: const CircleAvatar(
+                                  radius: 24,
+                                  backgroundColor: Colors.deepPurple,
+                                  child: Icon(
+                                    Icons.message_rounded,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        }
+
+                        return const Text(
+                          "This shouldn't happen",
+                        );
+                      },
+                    ),
+                  ),
+
+                  ///
+                  /// TEXT FIELD
+                  ///
+                  TextField(
+                    onSubmitted: (_) => sendController.sendMessage(
+                      chatId: chatId,
+                      messageType: MessageType.text,
+                      messageController: controller.messageController,
+                    ),
+                    controller: controller.messageController,
+                    decoration: const InputDecoration(
+                      labelText: 'Message...',
+                    ),
+                  ),
+                ],
               ),
           },
         ),
       ),
     );
-
-    // return Scaffold(
-    //   body: SafeArea(
-    //     child: Padding(
-    //       padding: const EdgeInsets.symmetric(
-    //         horizontal: 40,
-    //         vertical: 24,
-    //       ),
-    //       child: StreamBuilder(
-    //         stream: controller.streamAllUsers(),
-    //         builder: (context, usersSnapshot) {
-    //           ///
-    //           /// LOADING
-    //           ///
-    //           if (usersSnapshot.connectionState == ConnectionState.waiting) {
-    //             return const Center(
-    //               child: CircularProgressIndicator(),
-    //             );
-    //           }
-
-    //           ///
-    //           /// ERROR
-    //           ///
-    //           if (usersSnapshot.hasError) {
-    //             return Text(
-    //               usersSnapshot.error.toString(),
-    //             );
-    //           }
-
-    //           ///
-    //           /// SUCCESS
-    //           ///
-    //           if (usersSnapshot.hasData) {
-    //             final users = usersSnapshot.data;
-
-    //             return ListView.builder(
-    //               itemCount: users?.length ?? 0,
-    //               physics: const BouncingScrollPhysics(),
-    //               itemBuilder: (_, index) {
-    //                 final user = users![index];
-
-    //                 return ListTile(
-    //                   onTap: () {},
-    //                   title: Text(
-    //                     user.email ?? user.displayName,
-    //                   ),
-    //                 );
-    //               },
-    //             );
-    //           }
-
-    //           return Text(
-    //             usersSnapshot.error.toString(),
-    //           );
-    //         },
-    //       ),
-    //     ),
-    //   ),
-    // );
   }
 }

@@ -66,6 +66,10 @@ class _ChatScreenState extends State<ChatScreen> {
                 stream: usersController.streamCurrentUser(),
                 builder: (context, userSnapshot) => Text(
                   userSnapshot.data?.email ?? 'No email',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -122,16 +126,29 @@ class _ChatScreenState extends State<ChatScreen> {
                               context,
                               otherUser: user,
                             ),
-                            title: Text(user.displayName),
+                            title: Text(
+                              user.displayName,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             subtitle: Text(user.email),
-                            leading: const Icon(Icons.person_rounded),
+                            leading: const CircleAvatar(
+                              radius: 24,
+                              backgroundColor: Colors.deepPurple,
+                              child: Icon(
+                                Icons.person_rounded,
+                                color: Colors.white,
+                              ),
+                            ),
                           );
                         },
                       );
                     }
 
-                    return Text(
-                      usersSnapshot.error.toString(),
+                    return const Text(
+                      "This shouldn't happen",
                     );
                   },
                 ),

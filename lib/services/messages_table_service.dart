@@ -167,13 +167,15 @@ class MessagesTableService {
         throw Exception('Not authenticated');
       }
 
+      final newReaction = MessageUserStatus(
+        userId: userId,
+        messageId: messageId,
+        reaction: reaction,
+        createdAt: DateTime.now(),
+      );
+
       await supabase.from('reactions').upsert(
-            MessageUserStatus(
-              userId: userId,
-              messageId: messageId,
-              reaction: reaction,
-              createdAt: DateTime.now(),
-            ).toMap(),
+            newReaction.toMap(),
           );
 
       logger.t('MessagesTableService -> createReaction() -> success!');
