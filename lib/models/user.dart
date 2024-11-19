@@ -104,7 +104,7 @@ class RazgovorkoUser {
         isOnline: map['is_online'] as bool,
         lastSeen: DateTime.parse(map['last_seen']),
         createdAt: DateTime.parse(map['created_at']),
-        updatedAt: DateTime.parse(map['updatedAt']),
+        updatedAt: DateTime.parse(map['updated_at']),
         isDeleted: map['is_deleted'] as bool,
         accountDeletionDate: map['account_deletion_date'] != null ? DateTime.parse(map['account_deletion_date']) : null,
         pushNotificationToken: map['push_notification_token'] != null ? map['push_notification_token'] as String : null,

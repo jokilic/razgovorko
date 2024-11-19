@@ -58,17 +58,19 @@ class ConversationManagementController {
         throw Exception('Not authenticated');
       }
 
-      await Future.wait([
-        chatUserStatusTable.leaveChat(chatId: chatId),
-        chatsTable.deleteParticipants(
-          chatId: chatId,
-          participantIds: [userId],
-        ),
-        chatUserStatusTable.removeChatUserStatus(
-          userChatIds: [userId],
-          chatId: chatId,
-        ),
-      ]);
+      await Future.wait(
+        [
+          chatUserStatusTable.leaveChat(chatId: chatId),
+          chatsTable.deleteParticipants(
+            chatId: chatId,
+            participantIds: [userId],
+          ),
+          chatUserStatusTable.removeChatUserStatus(
+            userChatIds: [userId],
+            chatId: chatId,
+          ),
+        ],
+      );
 
       logger.t('ConversationManagementController -> leaveChat() -> success!');
     } catch (e) {

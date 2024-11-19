@@ -54,20 +54,22 @@ class ConversationSendController {
         messageController.clear();
 
         /// Update relevant database values
-        await Future.wait([
-          messageUserStatusTable.createMessageUserStatus(
-            userIds: [supabase.auth.currentUser!.id, ...userIds],
-            messageId: message.id,
-          ),
-          chatUserStatusTable.updateTypingStatus(
-            chatId: chatId,
-            isTyping: false,
-          ),
-          chatUserStatusTable.markChatAsRead(
-            chatId: chatId,
-            lastMessageId: message.id,
-          ),
-        ]);
+        await Future.wait(
+          [
+            messageUserStatusTable.createMessageUserStatus(
+              userIds: [supabase.auth.currentUser!.id, ...userIds],
+              messageId: message.id,
+            ),
+            chatUserStatusTable.updateTypingStatus(
+              chatId: chatId,
+              isTyping: false,
+            ),
+            chatUserStatusTable.markChatAsRead(
+              chatId: chatId,
+              lastMessageId: message.id,
+            ),
+          ],
+        );
 
         logger.t('ConversationSendController -> sendMessage() -> success!');
         return message;

@@ -17,4 +17,4 @@ Some text here...
 - [ ] Introduce indexes on the tables for better performance
 - [ ] Introduce some security on the tables
 - [ ] Replace all Exceptions with returning
-- [ ] Create message user status when sending a message
+- [ ] Remove all success logs

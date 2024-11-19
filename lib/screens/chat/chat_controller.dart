@@ -28,23 +28,28 @@ class ChatController {
   ///
 
   /// Stream current users `chats`
-  Stream<List<({Chat chat, int? unreadCount})>> streamChatsWithUnreadCounts() => chatsTable.streamCurrentUserChats().asyncMap(
+  Stream<List<({Chat chat, int? unreadCount})>?> streamChatsWithUnreadCounts() => chatsTable.streamCurrentUserChats().asyncMap(
         (chats) async {
-          final counts = await Future.wait(
-            chats!.map(
-              (chat) async {
-                final count = await chatUserStatusTable.getUnreadCount(
-                  chatId: chat.id,
-                );
+          if (chats != null) {
+            final counts = await Future.wait(
+              chats.map(
+                (chat) async {
+                  final count = await chatUserStatusTable.getUnreadCount(
+                    chatId: chat.id,
+                  );
 
-                return (
-                  chat: chat,
-                  unreadCount: count,
-                );
-              },
-            ),
-          );
-          return counts;
+                  return (
+                    chat: chat,
+                    unreadCount: count,
+                  );
+                },
+              ),
+            );
+
+            return counts;
+          }
+
+          return null;
         },
       );
 }
