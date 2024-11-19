@@ -73,7 +73,7 @@ class ChatsTableService {
         return chat;
       }
 
-      logger.e('ChatsTableService -> getChat() -> chat not found');
+      logger.e('ChatsTableService -> getChat() -> chat == null');
       return null;
     } catch (e) {
       logger.e('ChatsTableService -> getChat() -> $e');
@@ -187,7 +187,7 @@ class ChatsTableService {
       }
 
       /// Get current `chat` data
-      final chatResponse = await supabase.from('chats').select('participants, chat_type').eq('id', chatId).maybeSingle();
+      final chatResponse = await supabase.from('chats').select().eq('id', chatId).maybeSingle();
 
       if (chatResponse != null) {
         final chat = Chat.fromMap(chatResponse);
@@ -223,7 +223,7 @@ class ChatsTableService {
   }) async {
     try {
       /// Get current `chat` data
-      final chatResponse = await supabase.from('chats').select('participants, chat_type').eq('id', chatId).maybeSingle();
+      final chatResponse = await supabase.from('chats').select().eq('id', chatId).maybeSingle();
 
       if (chatResponse != null) {
         final chat = Chat.fromMap(chatResponse);

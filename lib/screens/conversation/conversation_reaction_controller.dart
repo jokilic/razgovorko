@@ -1,13 +1,13 @@
 import '../../services/logger_service.dart';
-import '../../services/messages_table_service.dart';
+import '../../services/message_user_status_table_service.dart';
 
 class ConversationReactionController {
   final LoggerService logger;
-  final MessagesTableService messagesTable;
+  final MessageUserStatusTableService messageUserStatusTable;
 
   ConversationReactionController({
     required this.logger,
-    required this.messagesTable,
+    required this.messageUserStatusTable,
   });
 
   ///
@@ -19,7 +19,7 @@ class ConversationReactionController {
     required String messageId,
     required String reaction,
   }) =>
-      messagesTable.createReaction(
+      messageUserStatusTable.createOrUpdateReaction(
         messageId: messageId,
         reaction: reaction,
       );
@@ -29,8 +29,7 @@ class ConversationReactionController {
     required String messageId,
     required String reaction,
   }) =>
-      messagesTable.deleteReaction(
+      messageUserStatusTable.deleteReaction(
         messageId: messageId,
-        reaction: reaction,
       );
 }

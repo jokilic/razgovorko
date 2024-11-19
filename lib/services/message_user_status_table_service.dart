@@ -27,6 +27,69 @@ class MessageUserStatusTableService {
   /// METHODS
   ///
 
+  Future<bool> createMessageUserStatus({
+    required List<String> userIds,
+    required String messageId,
+  }) async {
+    try {
+      final userId = supabase.auth.currentUser?.id;
+
+      if (userId == null) {
+        throw Exception('Not authenticated');
+      }
+
+      final now = DateTime.now();
+
+      /// Create [MessageUserStatus] entries for all `participants`
+      await Future.wait(
+        userIds.map(
+          (uid) {
+            final messageUserStatus = MessageUserStatus(
+              userId: userId,
+              messageId: messageId,
+              createdAt: now,
+            );
+
+            return supabase.from('message_user_status').insert(
+                  messageUserStatus.toMap(),
+                );
+          },
+        ),
+      );
+
+      logger.t('MessageUserStatusTableService -> createMessageUserStatus() -> success!');
+      return true;
+    } catch (e) {
+      logger.e('MessageUserStatusTableService -> createMessageUserStatus() -> $e');
+      return false;
+    }
+  }
+
+  /// Mark `message` as viewed
+  Future<bool> markMessageAsViewed({required String messageId}) async {
+    try {
+      final userId = supabase.auth.currentUser?.id;
+
+      if (userId == null) {
+        throw Exception('Not authenticated');
+      }
+
+      await supabase
+          .from('message_user_status')
+          .update({
+            'viewed_at': DateTime.now().toIso8601String(),
+          })
+          .eq('message_id', messageId)
+          .eq('user_id', userId);
+
+      logger.t('MessagesTableService -> markMessageAsViewed() -> success!');
+      return true;
+    } catch (e) {
+      logger.e('MessagesTableService -> markMessageAsViewed() -> $e');
+      return false;
+    }
+  }
+
   /// Creates or updates a `reaction`
   Future<bool> createOrUpdateReaction({
     required String messageId,
@@ -39,24 +102,24 @@ class MessageUserStatusTableService {
         throw Exception('Not authenticated');
       }
 
-      final now = DateTime.now();
+      await supabase
+          .from('message_user_status')
+          .update({
+            'reaction': reaction,
+          })
+          .eq('message_id', messageId)
+          .eq('user_id', userId);
 
-      await supabase.from('message_user_status').update({
-        'reaction': reaction,
-        'updated_at': now.toIso8601String(),
-        if (reaction == null) 'deleted_at': now.toIso8601String(),
-      });
-
-      logger.t('MessageUserStatusService -> updateReaction() -> success!');
+      logger.t('MessageUserStatusService -> createOrUpdateReaction() -> success!');
       return true;
     } catch (e) {
-      logger.e('MessageUserStatusService -> updateReaction() -> $e');
+      logger.e('MessageUserStatusService -> createOrUpdateReaction() -> $e');
       return false;
     }
   }
 
-  /// Mark `message` as viewed
-  Future<bool> markAsViewed({required String messageId}) async {
+  /// Remove reaction from `message`
+  Future<bool> deleteReaction({required String messageId}) async {
     try {
       final userId = supabase.auth.currentUser?.id;
 
@@ -64,17 +127,12 @@ class MessageUserStatusTableService {
         throw Exception('Not authenticated');
       }
 
-      final now = DateTime.now();
+      await supabase.from('message_user_status').delete().eq('message_id', messageId).eq('user_id', userId);
 
-      await supabase.from('message_user_status').update({
-        'viewed_at': now.toIso8601String(),
-        'updated_at': now.toIso8601String(),
-      });
-
-      logger.t('MessageUserStatusService -> markAsViewed() -> success!');
+      logger.t('MessagesTableService -> deleteReaction() -> success!');
       return true;
     } catch (e) {
-      logger.e('MessageUserStatusService -> markAsViewed() -> $e');
+      logger.e('MessagesTableService -> deleteReaction() -> $e');
       return false;
     }
   }

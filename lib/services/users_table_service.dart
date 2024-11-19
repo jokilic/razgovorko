@@ -48,17 +48,6 @@ class UsersTableService {
         );
   }
 
-  /// Stream specific `users` by IDs
-  Stream<List<RazgovorkoUser>?> streamUsersByIds(List<String> userIds) {
-    if (userIds.isEmpty) {
-      return Stream.value(null);
-    }
-
-    return supabase.from('users').stream(primaryKey: ['id']).inFilter('id', userIds).map(
-          (data) => data.isNotEmpty ? data.map((json) => RazgovorkoUser.fromMap(json)).toList() : null,
-        );
-  }
-
   ///
   /// METHODS
   ///
@@ -93,6 +82,7 @@ class UsersTableService {
         dateOfBirth: dateOfBirth,
         lastSeen: now,
         createdAt: now,
+        updatedAt: now,
         isOnline: true,
         isDeleted: false,
       );
@@ -176,7 +166,7 @@ class UsersTableService {
 
       await supabase.from('users').update({
         'is_online': isOnline,
-        'last_seen': DateTime.now().toIso8601String(),
+        if (!isOnline) 'last_seen': DateTime.now().toIso8601String(),
       }).eq('id', userId);
 
       logger.t('UsersTableService -> updateOnlineStatus() -> success!');
@@ -203,32 +193,13 @@ class UsersTableService {
           .eq('is_deleted', false)
           .or('display_name.ilike.%$query%,email.ilike.%$query%,phone_number.ilike.%$query%')
           .order('display_name');
-      final users = response.map((json) => RazgovorkoUser.fromMap(json)).toList();
+
+      final users = response.isNotEmpty ? response.map((json) => RazgovorkoUser.fromMap(json)).toList() : null;
 
       logger.t('UsersTableService -> searchUsers() -> success!');
       return users;
     } catch (e) {
       logger.e('UsersTableService -> searchUsers() -> $e');
-      return null;
-    }
-  }
-
-  /// Get `user` by ID
-  Future<RazgovorkoUser?> getUserById({required String userId}) async {
-    try {
-      final userResponse = await supabase.from('users').select().eq('id', userId).eq('is_deleted', false).maybeSingle();
-
-      if (userResponse != null) {
-        final user = RazgovorkoUser.fromMap(userResponse);
-
-        logger.t('UsersTableService -> getUserById() -> success!');
-        return user;
-      } else {
-        logger.e('UsersTableService -> getUserById() -> userResponse == null');
-        return null;
-      }
-    } catch (e) {
-      logger.e('UsersTableService -> getUserById() -> $e');
       return null;
     }
   }

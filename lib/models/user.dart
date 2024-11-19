@@ -11,6 +11,7 @@ class RazgovorkoUser {
   final bool isOnline;
   final DateTime lastSeen;
   final DateTime createdAt;
+  final DateTime updatedAt;
   final bool isDeleted;
   final DateTime? accountDeletionDate;
   final String? pushNotificationToken;
@@ -22,6 +23,7 @@ class RazgovorkoUser {
     required this.isOnline,
     required this.lastSeen,
     required this.createdAt,
+    required this.updatedAt,
     required this.isDeleted,
     this.phoneNumber,
     this.avatarUrl,
@@ -46,6 +48,7 @@ class RazgovorkoUser {
     bool? isOnline,
     DateTime? lastSeen,
     DateTime? createdAt,
+    DateTime? updatedAt,
     bool? isDeleted,
     DateTime? accountDeletionDate,
     String? pushNotificationToken,
@@ -63,6 +66,7 @@ class RazgovorkoUser {
         isOnline: isOnline ?? this.isOnline,
         lastSeen: lastSeen ?? this.lastSeen,
         createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
         isDeleted: isDeleted ?? this.isDeleted,
         accountDeletionDate: accountDeletionDate ?? this.accountDeletionDate,
         pushNotificationToken: pushNotificationToken ?? this.pushNotificationToken,
@@ -81,6 +85,7 @@ class RazgovorkoUser {
         'is_online': isOnline,
         'last_seen': lastSeen.toIso8601String(),
         'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt.toIso8601String(),
         'is_deleted': isDeleted,
         'account_deletion_date': accountDeletionDate?.toIso8601String(),
         'push_notification_token': pushNotificationToken,
@@ -99,6 +104,7 @@ class RazgovorkoUser {
         isOnline: map['is_online'] as bool,
         lastSeen: DateTime.parse(map['last_seen']),
         createdAt: DateTime.parse(map['created_at']),
+        updatedAt: DateTime.parse(map['updatedAt']),
         isDeleted: map['is_deleted'] as bool,
         accountDeletionDate: map['account_deletion_date'] != null ? DateTime.parse(map['account_deletion_date']) : null,
         pushNotificationToken: map['push_notification_token'] != null ? map['push_notification_token'] as String : null,
@@ -106,7 +112,7 @@ class RazgovorkoUser {
 
   @override
   String toString() =>
-      'RazgovorkoUser(id: $id, email: $email, phoneNumber: $phoneNumber, displayName: $displayName, avatarUrl: $avatarUrl, status: $status, aboutMe: $aboutMe, location: $location, dateOfBirth: $dateOfBirth, isOnline: $isOnline, lastSeen: $lastSeen, createdAt: $createdAt, isDeleted: $isDeleted, accountDeletionDate: $accountDeletionDate, pushNotificationToken: $pushNotificationToken)';
+      'RazgovorkoUser(id: $id, email: $email, phoneNumber: $phoneNumber, displayName: $displayName, avatarUrl: $avatarUrl, status: $status, aboutMe: $aboutMe, location: $location, dateOfBirth: $dateOfBirth, isOnline: $isOnline, lastSeen: $lastSeen, createdAt: $createdAt, updatedAt: $updatedAt, isDeleted: $isDeleted, accountDeletionDate: $accountDeletionDate, pushNotificationToken: $pushNotificationToken)';
 
   @override
   bool operator ==(covariant RazgovorkoUser other) {
@@ -126,6 +132,7 @@ class RazgovorkoUser {
         other.isOnline == isOnline &&
         other.lastSeen == lastSeen &&
         other.createdAt == createdAt &&
+        other.updatedAt == updatedAt &&
         other.isDeleted == isDeleted &&
         other.accountDeletionDate == accountDeletionDate &&
         other.pushNotificationToken == pushNotificationToken;
@@ -145,6 +152,7 @@ class RazgovorkoUser {
       isOnline.hashCode ^
       lastSeen.hashCode ^
       createdAt.hashCode ^
+      updatedAt.hashCode ^
       isDeleted.hashCode ^
       accountDeletionDate.hashCode ^
       pushNotificationToken.hashCode;

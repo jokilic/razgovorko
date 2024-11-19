@@ -115,7 +115,7 @@ class ConversationController extends ValueNotifier<RazgovorkoState<String>> impl
         /// Create [ChatUserStatus] for each `participant`
         if (newChat?.id != null) {
           final chatUserStatus = await chatUserStatusTable.createChatUserStatus(
-            participants: [supabase.auth.currentUser!.id, ...otherUserIds],
+            userIds: [supabase.auth.currentUser!.id, ...otherUserIds],
             chatId: newChat!.id,
           );
 

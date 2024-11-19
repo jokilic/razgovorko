@@ -1,7 +1,6 @@
 // ignore_for_file: unnecessary_lambdas
 
 import '../models/message.dart';
-import '../models/message_user_status.dart';
 import 'logger_service.dart';
 import 'supabase_service.dart';
 
@@ -20,14 +19,6 @@ class MessagesTableService {
   Stream<List<Message>?> streamMessages({required String chatId}) => supabase.from('messages').stream(primaryKey: ['id']).eq('chat_id', chatId).order('created_at').map(
         (data) => data.isNotEmpty ? data.map((json) => Message.fromMap(json)).toList() : null,
       );
-
-  /// Stream message `reactions`
-  Stream<List<MessageUserStatus>?> streamMessageReactions({
-    required String messageId,
-  }) =>
-      supabase.from('reactions').stream(primaryKey: ['id']).eq('message_id', messageId).order('created_at').map(
-            (data) => data.isNotEmpty ? data.map((json) => MessageUserStatus.fromMap(json)).toList() : null,
-          );
 
   ///
   /// MESSAGES
@@ -148,88 +139,6 @@ class MessagesTableService {
     } catch (e) {
       logger.e('MessagesTableService -> deleteMessage() -> $e');
       return null;
-    }
-  }
-
-  ///
-  /// REACTIONS
-  ///
-
-  /// Add `reaction` to `message`
-  Future<bool> createReaction({
-    required String messageId,
-    required String reaction,
-  }) async {
-    try {
-      final userId = supabase.auth.currentUser?.id;
-
-      if (userId == null) {
-        throw Exception('Not authenticated');
-      }
-
-      final newReaction = MessageUserStatus(
-        userId: userId,
-        messageId: messageId,
-        reaction: reaction,
-        createdAt: DateTime.now(),
-      );
-
-      await supabase.from('reactions').insert(
-            newReaction.toMap(),
-          );
-
-      logger.t('MessagesTableService -> createReaction() -> success!');
-      return true;
-    } catch (e) {
-      logger.e('MessagesTableService -> createReaction() -> $e');
-      return false;
-    }
-  }
-
-  /// Remove reaction from message
-  Future<bool> deleteReaction({
-    required String messageId,
-    required String reaction,
-  }) async {
-    try {
-      final userId = supabase.auth.currentUser?.id;
-
-      if (userId == null) {
-        throw Exception('Not authenticated');
-      }
-
-      await supabase.from('reactions').delete().eq('message_id', messageId).eq('user_id', userId).eq('reaction', reaction);
-
-      logger.t('MessagesTableService -> deleteReaction() -> success!');
-      return true;
-    } catch (e) {
-      logger.e('MessagesTableService -> deleteReaction() -> $e');
-      return false;
-    }
-  }
-
-  ///
-  /// VIEWS
-  ///
-
-  /// Mark `message` as viewed
-  Future<bool> markMessageAsViewed({required String messageId}) async {
-    try {
-      final userId = supabase.auth.currentUser?.id;
-
-      if (userId == null) {
-        throw Exception('Not authenticated');
-      }
-
-      await supabase.from('messages').update({
-        'viewed_at': DateTime.now().toIso8601String(),
-      }).eq('id', messageId);
-
-      logger.t('MessagesTableService -> markMessageAsViewed() -> success!');
-      return true;
-    } catch (e) {
-      logger.e('MessagesTableService -> markMessageAsViewed() -> $e');
-      return false;
     }
   }
 }

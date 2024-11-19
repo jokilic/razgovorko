@@ -1,4 +1,7 @@
+// ignore_for_file: unnecessary_lambdas
+
 import '../models/chat_user_status.dart';
+import '../models/user.dart';
 import 'logger_service.dart';
 import 'supabase_service.dart';
 
@@ -13,8 +16,8 @@ class ChatUserStatusTableService {
   /// STREAMS
   ///
 
-  /// Stream typing `userIds`
-  Stream<List<String>> streamTypingUserIds({required String chatId}) {
+  /// Stream typing `users`
+  Stream<List<RazgovorkoUser>> streamTypingUsers({required String chatId}) {
     final userId = supabase.auth.currentUser?.id;
 
     if (userId == null) {
@@ -22,7 +25,7 @@ class ChatUserStatusTableService {
     }
 
     return supabase.from('chat_user_status').stream(primaryKey: ['id']).eq('chat_id', chatId).map(
-          (rows) => rows.where((row) => row['user_id'] != userId && row['is_typing'] == true).map((row) => row['user_id'] as String).toList(),
+          (rows) => rows.where((row) => row['user_id'] != userId && row['is_typing'] == true).map((row) => RazgovorkoUser.fromMap(row)).toList(),
         );
   }
 
@@ -56,7 +59,7 @@ class ChatUserStatusTableService {
 
   /// User joins / creates a `chat`
   Future<bool> createChatUserStatus({
-    required List<String> participants,
+    required List<String> userIds,
     required String chatId,
   }) async {
     try {
@@ -66,17 +69,19 @@ class ChatUserStatusTableService {
         throw Exception('Not authenticated');
       }
 
+      final now = DateTime.now();
+
       /// Create [ChatUserStatus] entries for all `participants`
       await Future.wait(
-        participants.map(
-          (participantId) {
+        userIds.map(
+          (uid) {
             final chatUserStatus = ChatUserStatus(
-              userId: participantId,
+              userId: uid,
               chatId: chatId,
               isMuted: false,
               isTyping: false,
-              role: participantId == userId ? ChatRole.owner : ChatRole.member,
-              joinedAt: DateTime.now(),
+              role: uid == userId ? ChatRole.owner : ChatRole.member,
+              joinedAt: now,
             );
 
             return supabase.from('chat_user_status').insert(
@@ -94,9 +99,9 @@ class ChatUserStatusTableService {
     }
   }
 
-  /// User leaves a `chat`
+  /// Users leave a `chat`
   Future<bool> removeChatUserStatus({
-    required List<String> participants,
+    required List<String> userChatIds,
     required String chatId,
   }) async {
     try {
@@ -113,7 +118,7 @@ class ChatUserStatusTableService {
             'left_at': DateTime.now().toIso8601String(),
           })
           .eq('chat_id', chatId)
-          .inFilter('user_id', participants);
+          .inFilter('user_id', userChatIds);
 
       logger.t('ChatUserStatusTableService -> removeChatUserStatus() -> success!');
       return true;

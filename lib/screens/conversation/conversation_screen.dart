@@ -8,6 +8,7 @@ import '../../models/user.dart';
 import '../../services/chat_user_status_table_service.dart';
 import '../../services/chats_table_service.dart';
 import '../../services/logger_service.dart';
+import '../../services/message_user_status_table_service.dart';
 import '../../services/messages_table_service.dart';
 import '../../services/supabase_service.dart';
 import '../../util/state.dart';
@@ -38,6 +39,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         logger: getIt.get<LoggerService>(),
         chatUserStatusTable: getIt.get<ChatUserStatusTableService>(),
         messagesTable: getIt.get<MessagesTableService>(),
+        messageUserStatusTable: getIt.get<MessageUserStatusTableService>(),
       ),
     );
     registerIfNotInitialized<ConversationTypingController>(
@@ -56,7 +58,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     registerIfNotInitialized<ConversationReactionController>(
       () => ConversationReactionController(
         logger: getIt.get<LoggerService>(),
-        messagesTable: getIt.get<MessagesTableService>(),
+        messageUserStatusTable: getIt.get<MessageUserStatusTableService>(),
       ),
     );
     registerIfNotInitialized<ConversationController>(
@@ -210,6 +212,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 TextField(
                   onSubmitted: (_) => sendController.sendMessage(
                     chatId: chatId,
+                    userIds: [widget.otherUser.id],
                     messageType: MessageType.text,
                     messageController: controller.messageController,
                   ),

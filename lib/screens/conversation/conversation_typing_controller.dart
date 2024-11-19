@@ -1,3 +1,4 @@
+import '../../models/user.dart';
 import '../../services/chat_user_status_table_service.dart';
 import '../../services/logger_service.dart';
 
@@ -15,10 +16,10 @@ class ConversationTypingController {
   ///
 
   /// Returns a [Stream] which listens to typing `userIds`
-  Stream<List<String>> streamTypingUsers({
+  Stream<List<RazgovorkoUser>> streamTypingUsers({
     required String chatId,
   }) =>
-      chatUserStatusTable.streamTypingUserIds(
+      chatUserStatusTable.streamTypingUsers(
         chatId: chatId,
       );
 

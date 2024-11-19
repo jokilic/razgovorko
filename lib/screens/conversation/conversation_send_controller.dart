@@ -3,17 +3,21 @@ import 'package:flutter/material.dart';
 import '../../models/message.dart';
 import '../../services/chat_user_status_table_service.dart';
 import '../../services/logger_service.dart';
+import '../../services/message_user_status_table_service.dart';
 import '../../services/messages_table_service.dart';
+import '../../services/supabase_service.dart';
 
 class ConversationSendController {
   final LoggerService logger;
   final ChatUserStatusTableService chatUserStatusTable;
   final MessagesTableService messagesTable;
+  final MessageUserStatusTableService messageUserStatusTable;
 
   ConversationSendController({
     required this.logger,
     required this.chatUserStatusTable,
     required this.messagesTable,
+    required this.messageUserStatusTable,
   });
 
   ///
@@ -23,6 +27,7 @@ class ConversationSendController {
   /// Triggered when the `user` sends a `message`
   Future<Message?> sendMessage({
     required String chatId,
+    required List<String> userIds,
     required MessageType messageType,
     required TextEditingController messageController,
   }) async {
@@ -48,8 +53,12 @@ class ConversationSendController {
         /// Clear `messageController`
         messageController.clear();
 
-        /// Update typing status and last read
+        /// Update relevant database values
         await Future.wait([
+          messageUserStatusTable.createMessageUserStatus(
+            userIds: [supabase.auth.currentUser!.id, ...userIds],
+            messageId: message.id,
+          ),
           chatUserStatusTable.updateTypingStatus(
             chatId: chatId,
             isTyping: false,
