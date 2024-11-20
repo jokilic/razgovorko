@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/message.dart';
 import '../../services/chat_user_status_table_service.dart';
+import '../../services/chats_table_service.dart';
 import '../../services/logger_service.dart';
 import '../../services/message_user_status_table_service.dart';
 import '../../services/messages_table_service.dart';
@@ -9,12 +10,14 @@ import '../../services/supabase_service.dart';
 
 class ConversationSendController {
   final LoggerService logger;
+  final ChatsTableService chatsTable;
   final ChatUserStatusTableService chatUserStatusTable;
   final MessagesTableService messagesTable;
   final MessageUserStatusTableService messageUserStatusTable;
 
   ConversationSendController({
     required this.logger,
+    required this.chatsTable,
     required this.chatUserStatusTable,
     required this.messagesTable,
     required this.messageUserStatusTable,
@@ -56,14 +59,25 @@ class ConversationSendController {
         /// Update relevant database values
         await Future.wait(
           [
+            /// Updates `lastMessageId` in `chat` table
+            chatsTable.updateChat(
+              chatId: chatId,
+              lastMessageId: message.id,
+            ),
+
+            /// Creates [MessageUserStatus] for each `user`
             messageUserStatusTable.createMessageUserStatus(
               userIds: [supabase.auth.currentUser!.id, ...userIds],
               messageId: message.id,
             ),
+
+            /// Updates typing status for `user`
             chatUserStatusTable.updateTypingStatus(
               chatId: chatId,
               isTyping: false,
             ),
+
+            /// Marks chat as read for for `user`
             chatUserStatusTable.markChatAsRead(
               chatId: chatId,
               lastMessageId: message.id,

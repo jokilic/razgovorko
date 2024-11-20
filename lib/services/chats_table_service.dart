@@ -54,8 +54,8 @@ class ChatsTableService {
         throw Exception('Group chat should have a name');
       }
 
-      /// Create a list of `participantIds`
-      final allParticipants = [userId, ...otherUserIds];
+      /// Create a list of `participants`
+      final allParticipants = {userId, ...otherUserIds}.toList();
 
       var query = supabase.from('chats').select().eq('chat_type', chatType.name).contains('participants', allParticipants);
 
@@ -97,7 +97,9 @@ class ChatsTableService {
       }
 
       final now = DateTime.now();
-      final allParticipants = [userId, ...otherUserIds];
+
+      /// Create a list of `participants`
+      final allParticipants = {userId, ...otherUserIds}.toList();
 
       /// Validate `chat` creation
       if (chatType == ChatType.individual && allParticipants.length != 2) {
@@ -139,6 +141,7 @@ class ChatsTableService {
     String? name,
     String? description,
     String? avatarUrl,
+    String? lastMessageId,
   }) async {
     try {
       final userId = supabase.auth.currentUser?.id;
@@ -153,7 +156,8 @@ class ChatsTableService {
             if (name != null) 'name': name,
             if (description != null) 'description': description,
             if (avatarUrl != null) 'avatar_url': avatarUrl,
-            'updated_at': DateTime.now().toIso8601String(),
+            if (lastMessageId != null) 'last_message_id': lastMessageId,
+            if (name != null || description != null || avatarUrl != null) 'updated_at': DateTime.now().toIso8601String(),
           })
           .eq('id', chatId)
           .select()
@@ -196,6 +200,7 @@ class ChatsTableService {
           throw Exception('Cannot add participants to individual chat');
         }
 
+        /// Create a list of `participants`
         final allParticipants = {...chat.participants, ...newParticipantIds}.toList();
 
         /// Update `chat` participants

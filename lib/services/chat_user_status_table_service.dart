@@ -59,7 +59,7 @@ class ChatUserStatusTableService {
 
   /// User joins / creates a `chat`
   Future<bool> createChatUserStatus({
-    required List<String> userIds,
+    required List<String> otherUserIds,
     required String chatId,
   }) async {
     try {
@@ -71,14 +71,18 @@ class ChatUserStatusTableService {
 
       final now = DateTime.now();
 
+      /// Create a list of `participants`
+      final allParticipants = {userId, ...otherUserIds}.toList();
+
       /// Create [ChatUserStatus] entries for all `participants`
       await Future.wait(
-        userIds.map(
+        allParticipants.map(
           (uid) {
             final chatUserStatus = ChatUserStatus(
               userId: uid,
               chatId: chatId,
               isMuted: false,
+              isPinned: false,
               isTyping: false,
               role: uid == userId ? ChatRole.owner : ChatRole.member,
               joinedAt: now,

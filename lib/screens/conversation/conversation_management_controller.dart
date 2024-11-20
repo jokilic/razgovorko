@@ -32,7 +32,7 @@ class ConversationManagementController {
     /// Create [ChatUserStatus] for new `participants`
     if (participantsResponse) {
       final chatUserStatusResponse = await chatUserStatusTable.createChatUserStatus(
-        userIds: userIds,
+        otherUserIds: userIds,
         chatId: chatId,
       );
 

@@ -57,6 +57,7 @@ class UsersTableService {
     required User supabaseUser,
     String? displayName,
     String? avatarUrl,
+    String? status,
     String? aboutMe,
     String? location,
     DateTime? dateOfBirth,
@@ -74,9 +75,9 @@ class UsersTableService {
         id: supabaseUser.id,
         email: supabaseUser.email!,
         phoneNumber: supabaseUser.phone,
-        displayName: displayName ?? supabaseUser.email!.split('@')[0], // Use email username as default
+        displayName: displayName ?? supabaseUser.email!.split('@').first, // Use email username as default
         avatarUrl: avatarUrl,
-        status: 'Hello, I am using Razgovorko!',
+        status: status,
         aboutMe: aboutMe,
         location: location,
         dateOfBirth: dateOfBirth,
@@ -84,7 +85,6 @@ class UsersTableService {
         createdAt: now,
         updatedAt: now,
         isOnline: true,
-        isDeleted: false,
       );
 
       /// Insert into `users` table
@@ -110,11 +110,11 @@ class UsersTableService {
     String? email,
     String? phoneNumber,
     String? displayName,
+    String? avatarUrl,
     String? status,
     String? aboutMe,
     String? location,
     DateTime? dateOfBirth,
-    String? avatarUrl,
   }) async {
     try {
       final userId = supabase.auth.currentUser?.id;
@@ -129,11 +129,11 @@ class UsersTableService {
             if (email != null) 'email': email,
             if (phoneNumber != null) 'phone_number': phoneNumber,
             if (displayName != null) 'display_name': displayName,
+            if (avatarUrl != null) 'avatar_url': avatarUrl,
             if (status != null) 'status': status,
             if (aboutMe != null) 'about_me': aboutMe,
             if (location != null) 'location': location,
             if (dateOfBirth != null) 'date_of_birth': dateOfBirth.toIso8601String(),
-            if (avatarUrl != null) 'avatar_url': avatarUrl,
             'updated_at': DateTime.now().toIso8601String(),
           })
           .eq('id', userId)
@@ -213,10 +213,14 @@ class UsersTableService {
         throw Exception('Not authenticated');
       }
 
+      final now = DateTime.now();
+
       await supabase.from('users').update({
-        'is_deleted': true,
-        'deleted_at': DateTime.now().toIso8601String(),
+        'deleted_at': now.toIso8601String(),
         'is_online': false,
+        'last_seen': now.toIso8601String(),
+        'pushNotificationToken': null,
+        'updated_at': now.toIso8601String(),
       }).eq('id', userId);
 
       logger.t('UsersTableService -> deleteUserProfile() -> success!');
