@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../dependencies.dart';
+import '../../models/chat.dart';
 import '../../routing.dart';
 import '../../services/auth_service.dart';
 import '../../services/chat_user_status_table_service.dart';
@@ -124,7 +125,9 @@ class _ChatScreenState extends State<ChatScreen> {
                           return ListTile(
                             onTap: () => openConversation(
                               context,
-                              otherUser: user,
+                              otherUsers: users,
+                              chatName: 'Our chat',
+                              chatType: ChatType.group,
                             ),
                             title: Text(
                               user.displayName,

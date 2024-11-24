@@ -7,12 +7,12 @@ import '../../services/auth_service.dart';
 import '../../services/logger_service.dart';
 import '../../services/users_table_service.dart';
 
-class LoginController implements Disposable {
+class WelcomeController implements Disposable {
   final LoggerService logger;
   final AuthService auth;
   final UsersTableService usersTable;
 
-  LoginController({
+  WelcomeController({
     required this.logger,
     required this.auth,
     required this.usersTable,
@@ -22,7 +22,7 @@ class LoginController implements Disposable {
   /// VARIABLES
   ///
 
-  final emailController = TextEditingController();
+  final nameController = TextEditingController();
   final passwordController = TextEditingController();
 
   ///
@@ -31,7 +31,7 @@ class LoginController implements Disposable {
 
   @override
   void onDispose() {
-    emailController.dispose();
+    nameController.dispose();
     passwordController.dispose();
   }
 
@@ -53,14 +53,14 @@ class LoginController implements Disposable {
       final supabaseUser = authResponse?.user;
 
       if (supabaseUser != null) {
-        logger.t('LoginController -> signIn() -> success!');
+        logger.t('WelcomeController -> signIn() -> success!');
         return supabaseUser;
       } else {
-        logger.e('LoginController -> signIn() -> supabaseUser == null');
+        logger.e('WelcomeController -> signIn() -> supabaseUser == null');
         return null;
       }
     } catch (e) {
-      logger.e('LoginController -> signIn() -> $e');
+      logger.e('WelcomeController -> signIn() -> $e');
       return null;
     }
   }
@@ -79,14 +79,14 @@ class LoginController implements Disposable {
       final supabaseUser = authResponse?.user;
 
       if (supabaseUser != null) {
-        logger.t('LoginController -> signUp() -> success!');
+        logger.t('WelcomeController -> signUp() -> success!');
         return supabaseUser;
       } else {
-        logger.e('LoginController -> signUp() -> supabaseUser == null');
+        logger.e('WelcomeController -> signUp() -> supabaseUser == null');
         return null;
       }
     } catch (e) {
-      logger.e('LoginController -> signUp() -> $e');
+      logger.e('WelcomeController -> signUp() -> $e');
       return null;
     }
   }
@@ -99,14 +99,14 @@ class LoginController implements Disposable {
       );
 
       if (razgovorkoUser != null) {
-        logger.t('LoginController -> createUser() -> success!');
+        logger.t('WelcomeController -> createUser() -> success!');
         return razgovorkoUser;
       } else {
-        logger.e('LoginController -> createUser() -> razgovorkoUser == null');
+        logger.e('WelcomeController -> createUser() -> razgovorkoUser == null');
         return null;
       }
     } catch (e) {
-      logger.e('LoginController -> createUser() -> $e');
+      logger.e('WelcomeController -> createUser() -> $e');
       return null;
     }
   }

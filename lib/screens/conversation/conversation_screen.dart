@@ -19,10 +19,14 @@ import 'conversation_send_controller.dart';
 import 'conversation_typing_controller.dart';
 
 class ConversationScreen extends WatchingStatefulWidget {
-  final RazgovorkoUser otherUser;
+  final List<RazgovorkoUser> otherUsers;
+  final ChatType chatType;
+  final String? chatName;
 
   const ConversationScreen({
-    required this.otherUser,
+    required this.otherUsers,
+    required this.chatType,
+    required this.chatName,
   });
 
   @override
@@ -30,6 +34,8 @@ class ConversationScreen extends WatchingStatefulWidget {
 }
 
 class _ConversationScreenState extends State<ConversationScreen> {
+  late final otherUserIds = widget.otherUsers.map((user) => user.id).toList();
+
   @override
   void initState() {
     super.initState();
@@ -37,6 +43,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     registerIfNotInitialized<ConversationSendController>(
       () => ConversationSendController(
         logger: getIt.get<LoggerService>(),
+        chatsTable: getIt.get<ChatsTableService>(),
         chatUserStatusTable: getIt.get<ChatUserStatusTableService>(),
         messagesTable: getIt.get<MessagesTableService>(),
         messageUserStatusTable: getIt.get<MessageUserStatusTableService>(),
@@ -69,8 +76,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
         messagesTable: getIt.get<MessagesTableService>(),
       ),
       afterRegister: (controller) => controller.init(
-        otherUserIds: [widget.otherUser.id],
-        chatType: ChatType.individual,
+        otherUserIds: otherUserIds,
+        chatType: widget.chatType,
+        name: widget.chatName,
       ),
     );
   }
@@ -96,7 +104,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Conversation with ${widget.otherUser.displayName}',
+          'Conversation with ${widget.otherUsers.map((user) => user.displayName).toList()}',
         ),
       ),
       body: SafeArea(
@@ -212,7 +220,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 TextField(
                   onSubmitted: (_) => sendController.sendMessage(
                     chatId: chatId,
-                    userIds: [widget.otherUser.id],
+                    userIds: otherUserIds,
                     messageType: MessageType.text,
                     messageController: controller.messageController,
                   ),

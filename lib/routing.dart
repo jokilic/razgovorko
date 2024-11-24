@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 
+import 'models/chat.dart';
 import 'models/user.dart';
 import 'screens/chat/chat_screen.dart';
 import 'screens/conversation/conversation_screen.dart';
-import 'screens/login/login_screen.dart';
+import 'screens/welcome/welcome_screen.dart';
 import 'util/navigation.dart';
 
-/// Opens [LoginScreen]
-void openLogin(BuildContext context) => pushScreen(
-      LoginScreen(),
+/// Opens [WelcomeScreen]
+void openWelcome(BuildContext context) => pushScreen(
+      WelcomeScreen(),
       context: context,
     );
 
@@ -19,9 +20,17 @@ void openChat(BuildContext context) => pushScreen(
     );
 
 /// Opens [ConversationScreen]
-void openConversation(BuildContext context, {required RazgovorkoUser otherUser}) => pushScreen(
+void openConversation(
+  BuildContext context, {
+  required List<RazgovorkoUser> otherUsers,
+  required ChatType chatType,
+  required String? chatName,
+}) =>
+    pushScreen(
       ConversationScreen(
-        otherUser: otherUser,
+        otherUsers: otherUsers,
+        chatType: chatType,
+        chatName: chatName,
       ),
       context: context,
     );

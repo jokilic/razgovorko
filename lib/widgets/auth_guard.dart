@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../dependencies.dart';
 import '../screens/chat/chat_screen.dart';
-import '../screens/login/login_screen.dart';
+import '../screens/welcome/welcome_screen.dart';
 import '../services/auth_service.dart';
 
 class AuthGuard extends StatelessWidget {
@@ -44,7 +44,7 @@ class AuthGuard extends StatelessWidget {
               /// NOT LOGGED IN
               ///
               else {
-                return LoginScreen();
+                return WelcomeScreen();
               }
             }
 

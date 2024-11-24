@@ -7,7 +7,6 @@ import '../../services/chat_user_status_table_service.dart';
 import '../../services/chats_table_service.dart';
 import '../../services/logger_service.dart';
 import '../../services/messages_table_service.dart';
-import '../../services/supabase_service.dart';
 import '../../util/state.dart';
 
 class ConversationController extends ValueNotifier<RazgovorkoState<String>> implements Disposable {

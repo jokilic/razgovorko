@@ -28,7 +28,7 @@ class MessageUserStatusTableService {
   ///
 
   Future<bool> createMessageUserStatus({
-    required List<String> userIds,
+    required List<String> otherUserIds,
     required String messageId,
   }) async {
     try {
@@ -40,9 +40,12 @@ class MessageUserStatusTableService {
 
       final now = DateTime.now();
 
+      /// Create a list of `participants`
+      final allParticipants = {userId, ...otherUserIds}.toList();
+
       /// Create [MessageUserStatus] entries for all `participants`
       await Future.wait(
-        userIds.map(
+        allParticipants.map(
           (uid) {
             final messageUserStatus = MessageUserStatus(
               userId: userId,

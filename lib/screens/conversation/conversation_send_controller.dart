@@ -67,20 +67,20 @@ class ConversationSendController {
 
             /// Creates [MessageUserStatus] for each `user`
             messageUserStatusTable.createMessageUserStatus(
-              userIds: [supabase.auth.currentUser!.id, ...userIds],
+              otherUserIds: [supabase.auth.currentUser!.id, ...userIds],
               messageId: message.id,
-            ),
-
-            /// Updates typing status for `user`
-            chatUserStatusTable.updateTypingStatus(
-              chatId: chatId,
-              isTyping: false,
             ),
 
             /// Marks chat as read for for `user`
             chatUserStatusTable.markChatAsRead(
               chatId: chatId,
               lastMessageId: message.id,
+            ),
+
+            /// Updates typing status for `user`
+            chatUserStatusTable.updateTypingStatus(
+              chatId: chatId,
+              isTyping: false,
             ),
           ],
         );
