@@ -64,8 +64,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ElevatedButton.icon(
                     onPressed: () async {
                       final supabaseUser = await controller.signUp(
-                        email: controller.nameController.text.trim(),
-                        password: controller.passwordController.text.trim(),
+                        email: 'neksuses@gmail.com',
+                        password: 'helloneksus',
                       );
 
                       if (supabaseUser != null) {
@@ -80,9 +80,25 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         48,
                       ),
                     ),
-                    label: Text('Signup'.toUpperCase()),
+                    label: Text('R neksuses'.toUpperCase()),
                     icon: const Icon(
-                      Icons.app_registration_rounded,
+                      Icons.person_rounded,
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () async => controller.signIn(
+                      email: 'neksuses@gmail.com',
+                      password: 'helloneksus',
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(
+                        double.infinity,
+                        48,
+                      ),
+                    ),
+                    label: Text('L neksuses'.toUpperCase()),
+                    icon: const Icon(
+                      Icons.login_rounded,
                     ),
                   ),
                 ],

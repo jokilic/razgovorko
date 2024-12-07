@@ -10,8 +10,11 @@ dependencies:
   flutter:
     sdk: flutter
 
+  fast_contacts: 4.0.0
+  flutter_libphonenumber: 2.5.0
   get_it: 8.0.2
   logger: 2.4.0
+  phone_numbers_parser: 9.0.3
   supabase_flutter: 2.8.0
   watch_it: 1.5.1
 

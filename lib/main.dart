@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'dependencies.dart';
-import 'widgets/auth_guard.dart';
+import 'screens/phone_parse/phone_parse_screen.dart';
 
 Future<void> main() async {
   /// Initialize [Flutter] related tasks
@@ -28,6 +28,6 @@ class RazgovorkoApp extends StatelessWidget {
   Widget build(BuildContext context) => MaterialApp(
         debugShowCheckedModeBanner: false,
         onGenerateTitle: (_) => 'Razgovorko',
-        home: AuthGuard(),
+        home: PhoneParseScreen(),
       );
 }
