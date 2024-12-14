@@ -65,8 +65,8 @@ class WelcomeController implements Disposable {
     }
   }
 
-  /// Registers `user` in [Supabase]
-  Future<User?> signUp({
+  /// Registers `user` with `email` in [Supabase]
+  Future<User?> signUpWithEmail({
     required String email,
     required String password,
   }) async {
@@ -79,23 +79,29 @@ class WelcomeController implements Disposable {
       final supabaseUser = authResponse?.user;
 
       if (supabaseUser != null) {
-        logger.t('WelcomeController -> signUp() -> success!');
+        logger.t('WelcomeController -> signUpWithEmail() -> success!');
         return supabaseUser;
       } else {
-        logger.e('WelcomeController -> signUp() -> supabaseUser == null');
+        logger.e('WelcomeController -> signUpWithEmail() -> supabaseUser == null');
         return null;
       }
     } catch (e) {
-      logger.e('WelcomeController -> signUp() -> $e');
+      logger.e('WelcomeController -> signUpWithEmail() -> $e');
       return null;
     }
   }
 
   /// Creates `user` in `users` table
-  Future<RazgovorkoUser?> createUser({required User supabaseUser}) async {
+  Future<RazgovorkoUser?> createUser({
+    required User supabaseUser,
+    required String internationalPhoneNumber,
+    required String nationalPhoneNumber,
+  }) async {
     try {
       final razgovorkoUser = await usersTable.createUserProfile(
         supabaseUser: supabaseUser,
+        internationalPhoneNumber: internationalPhoneNumber,
+        nationalPhoneNumber: nationalPhoneNumber,
       );
 
       if (razgovorkoUser != null) {

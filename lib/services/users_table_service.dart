@@ -55,6 +55,8 @@ class UsersTableService {
   /// Stores user data in `users` table
   Future<RazgovorkoUser?> createUserProfile({
     required User supabaseUser,
+    required String internationalPhoneNumber,
+    required String nationalPhoneNumber,
     String? displayName,
     String? avatarUrl,
     String? status,
@@ -74,7 +76,8 @@ class UsersTableService {
       final user = RazgovorkoUser(
         id: supabaseUser.id,
         email: supabaseUser.email!,
-        phoneNumber: supabaseUser.phone,
+        internationalPhoneNumber: internationalPhoneNumber,
+        nationalPhoneNumber: nationalPhoneNumber,
         displayName: displayName ?? supabaseUser.email!.split('@').first, // Use email username as default
         avatarUrl: avatarUrl,
         status: status,

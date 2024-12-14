@@ -40,6 +40,7 @@ class AuthService {
   }
 
   /// Registers user in [Supabase] using `email` & `password`
+  /// Uses phone number instead of a proper `email`
   Future<AuthResponse?> signUpWithEmailAndPassword({
     required String email,
     required String password,

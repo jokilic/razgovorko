@@ -50,27 +50,50 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             /// CONTENT
             ///
             Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 40,
-                vertical: 24,
-              ),
+              padding: const EdgeInsets.all(28),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('What is your name?'),
+                  const Text(
+                    'Welcome to Razgovorko',
+                    style: TextStyle(
+                      fontFamily: 'AguDisplay',
+                      fontSize: 28,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Razgovorko will help you chat with people.',
+                    style: TextStyle(
+                      fontFamily: 'Kanit',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  const Text(
+                    'What is your name?',
+                    style: TextStyle(
+                      fontFamily: 'Kanit',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
                   TextField(
                     controller: controller.nameController,
                   ),
                   ElevatedButton.icon(
                     onPressed: () async {
-                      final supabaseUser = await controller.signUp(
-                        email: 'neksuses@gmail.com',
-                        password: 'helloneksus',
+                      final supabaseUser = await controller.signUpWithEmail(
+                        email: 'mail@gmail.com',
+                        password: 'hellothere',
                       );
 
                       if (supabaseUser != null) {
                         await controller.createUser(
                           supabaseUser: supabaseUser,
+                          internationalPhoneNumber: '',
+                          nationalPhoneNumber: '',
                         );
                       }
                     },
