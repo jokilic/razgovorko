@@ -79,25 +79,7 @@ class _PhoneParseScreenState extends State<PhoneParseScreen> {
                   ),
                   const SizedBox(height: 32),
                   ElevatedButton(
-                    onPressed: () => controller.triggerPhoneNumbersParser(
-                      controller.phoneNumberController.text.trim(),
-                      context: context,
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.indigoAccent,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(
-                        double.infinity,
-                        48,
-                      ),
-                    ),
-                    child: Text(
-                      'PhoneNumbersParser'.toUpperCase(),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () => controller.triggerFlutterLibPhoneNumber(
+                    onPressed: () => controller.parsePhoneNumber(
                       controller.phoneNumberController.text.trim(),
                       context: context,
                     ),
