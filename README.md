@@ -13,11 +13,12 @@ Some text here...
 
 ### General To-Dos
 
-- [ ] Lots of things
+- [ ] Theme, text styles, colors, etc.
 - [ ] Introduce indexes on the tables for better performance
 - [ ] Introduce some security on the tables
 - [ ] Replace all Exceptions with returning
 - [ ] Remove all success logs
+- [ ] Use [this](https://pub.dev/packages/google_phone_number_hint)
 
 ## Database structure
 

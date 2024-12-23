@@ -27,13 +27,46 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/
+    - assets/images/
 
   fonts:
     - family: AguDisplay
       fonts:
         - asset: assets/fonts/AguDisplay/AguDisplay-Regular.ttf
           weight: 600
+
+    - family: PlayfairDisplay
+      fonts:
+        - asset: assets/fonts/PlayfairDisplay/PlayfairDisplay-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/PlayfairDisplay/PlayfairDisplay-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/PlayfairDisplay/PlayfairDisplay-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/PlayfairDisplay/PlayfairDisplay-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: assets/fonts/PlayfairDisplay/PlayfairDisplay-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/PlayfairDisplay/PlayfairDisplay-SemiBoldItalic.ttf
+          weight: 600
+          style: italic
+        - asset: assets/fonts/PlayfairDisplay/PlayfairDisplay-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/PlayfairDisplay/PlayfairDisplay-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/PlayfairDisplay/PlayfairDisplay-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/PlayfairDisplay/PlayfairDisplay-ExtraBoldItalic.ttf
+          weight: 800
+          style: italic
+        - asset: assets/fonts/PlayfairDisplay/PlayfairDisplay-Black.ttf
+          weight: 900
+        - asset: assets/fonts/PlayfairDisplay/PlayfairDisplay-BlackItalic.ttf
+          weight: 900
+          style: italic
 
     - family: Kanit
       fonts:

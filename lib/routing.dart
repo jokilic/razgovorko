@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 import 'models/chat.dart';
 import 'models/user.dart';
+import 'onboarding/onboarding_name/onboarding_name_screen.dart';
 import 'screens/chat/chat_screen.dart';
 import 'screens/conversation/conversation_screen.dart';
-import 'screens/welcome/welcome_screen.dart';
 import 'util/navigation.dart';
 
-/// Opens [WelcomeScreen]
-void openWelcome(BuildContext context) => pushScreen(
-      WelcomeScreen(),
+/// Opens [OnboardingNameScreen]
+void openOnboardingName(BuildContext context) => pushScreen(
+      OnboardingNameScreen(),
       context: context,
     );
 
