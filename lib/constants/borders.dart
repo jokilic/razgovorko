@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class RazgovorkoBorders {
-  static const onboardingNameBorder = UnderlineInputBorder(
+  static const onboardingBorder = UnderlineInputBorder(
     borderSide: BorderSide(
       width: 1.5,
     ),

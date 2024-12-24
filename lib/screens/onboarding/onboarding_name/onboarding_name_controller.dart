@@ -1,29 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 
-import '../../services/logger_service.dart';
+import '../../../services/logger_service.dart';
 
-class OnboardingNameController implements Disposable {
+class OnboardingNameController extends ValueNotifier<String?> {
   final LoggerService logger;
 
   OnboardingNameController({
     required this.logger,
-  });
-
-  ///
-  /// VARIABLES
-  ///
-
-  final nameController = TextEditingController();
-
-  ///
-  /// DISPOSE
-  ///
-
-  @override
-  void onDispose() {
-    nameController.dispose();
-  }
+  }) : super(null);
 
   ///
   /// METHODS

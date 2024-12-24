@@ -57,7 +57,7 @@ class UsersTableService {
     required User supabaseUser,
     required String internationalPhoneNumber,
     required String nationalPhoneNumber,
-    String? displayName,
+    required String displayName,
     String? avatarUrl,
     String? status,
     String? aboutMe,
@@ -78,7 +78,7 @@ class UsersTableService {
         email: supabaseUser.email!,
         internationalPhoneNumber: internationalPhoneNumber,
         nationalPhoneNumber: nationalPhoneNumber,
-        displayName: displayName ?? supabaseUser.email!.split('@').first, // Use email username as default
+        displayName: displayName,
         avatarUrl: avatarUrl,
         status: status,
         aboutMe: aboutMe,

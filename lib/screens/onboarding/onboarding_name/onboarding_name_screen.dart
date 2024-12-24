@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:watch_it/watch_it.dart';
 
-import '../../constants/borders.dart';
-import '../../constants/images.dart';
-import '../../dependencies.dart';
-import '../../services/logger_service.dart';
-import '../../widgets/razgovorko_button.dart';
+import '../../../constants/images.dart';
+import '../../../dependencies.dart';
+import '../../../routing.dart';
+import '../../../services/logger_service.dart';
+import '../../../theme/theme.dart';
+import '../../../widgets/razgovorko_button.dart';
+import '../widgets/onboarding_text_field.dart';
 import 'onboarding_name_controller.dart';
 
-class OnboardingNameScreen extends StatefulWidget {
+class OnboardingNameScreen extends WatchingStatefulWidget {
   @override
   State<OnboardingNameScreen> createState() => _OnboardingNameScreenState();
 }
@@ -33,11 +36,12 @@ class _OnboardingNameScreenState extends State<OnboardingNameScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = getIt.get<OnboardingNameController>();
+    final nameState = watchIt<OnboardingNameController>().value;
+
     final topSpacing = MediaQuery.paddingOf(context).top;
     final bottomSpacing = MediaQuery.paddingOf(context).bottom;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       body: Column(
         children: [
           ///
@@ -47,7 +51,7 @@ class _OnboardingNameScreenState extends State<OnboardingNameScreen> {
             child: Padding(
               padding: EdgeInsets.fromLTRB(40, topSpacing, 40, bottomSpacing),
               child: Image.asset(
-                RazgovorkoImages.onboardingIllustration,
+                RazgovorkoImages.illustration1,
               ),
             ),
           ),
@@ -60,72 +64,35 @@ class _OnboardingNameScreenState extends State<OnboardingNameScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Welcome to Razgovorko',
-                  style: TextStyle(
-                    fontFamily: 'PlayfairDisplay',
-                    fontSize: 28,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: context.textStyles.onboardingTitle,
                 ),
                 const SizedBox(height: 6),
-                const Text(
+                Text(
                   'Razgovorko will help you chat with people.',
-                  style: TextStyle(
-                    fontFamily: 'Kanit',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                  ),
+                  style: context.textStyles.onboardingText,
                 ),
                 const SizedBox(height: 32),
-                const Text(
+                Text(
                   'What is your name?',
-                  style: TextStyle(
-                    fontFamily: 'Kanit',
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                  ),
+                  style: context.textStyles.onboardingText,
                 ),
                 const SizedBox(height: 4),
-                TextField(
-                  controller: controller.nameController,
-                  cursorColor: Colors.black,
-                  cursorRadius: const Radius.circular(8),
-                  cursorHeight: 20,
-                  cursorWidth: 1.5,
+                OnboardingTextField(
+                  onChanged: (newName) => controller.value = newName,
                   keyboardType: TextInputType.name,
                   textInputAction: TextInputAction.done,
-                  style: const TextStyle(
-                    fontFamily: 'Kanit',
-                    fontSize: 24,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black,
-                    letterSpacing: 0.8,
-                  ),
-                  decoration: InputDecoration(
-                    isCollapsed: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                    alignLabelWithHint: true,
-                    labelStyle: TextStyle(
-                      fontFamily: 'Kanit',
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black.withOpacity(0.35),
-                      letterSpacing: 0.8,
-                    ),
-                    labelText: 'Type your name...',
-                    floatingLabelBehavior: FloatingLabelBehavior.never,
-                    border: RazgovorkoBorders.onboardingNameBorder,
-                    focusedErrorBorder: RazgovorkoBorders.onboardingNameBorder,
-                    disabledBorder: RazgovorkoBorders.onboardingNameBorder,
-                    focusedBorder: RazgovorkoBorders.onboardingNameBorder,
-                    errorBorder: RazgovorkoBorders.onboardingNameBorder,
-                    enabledBorder: RazgovorkoBorders.onboardingNameBorder,
-                  ),
+                  labelText: 'Type your name...',
                 ),
                 const SizedBox(height: 40),
                 RazgovorkoButton(
-                  onPressed: () {},
+                  onPressed: (nameState?.isNotEmpty ?? false)
+                      ? () => openOnboardingNumber(
+                            context,
+                            name: nameState!.trim(),
+                          )
+                      : null,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
@@ -135,20 +102,14 @@ class _OnboardingNameScreenState extends State<OnboardingNameScreen> {
                       borderRadius: BorderRadius.circular(32),
                       border: Border.all(
                         width: 2.5,
-                        color: Colors.cyan,
+                        color: context.colors.blue.withOpacity((nameState?.isNotEmpty ?? false) ? 1 : 0.25),
                       ),
                     ),
                     alignment: Alignment.center,
-                    child: const Text(
+                    child: Text(
                       'Get started',
+                      style: context.textStyles.onboardingButton,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Kanit',
-                        fontSize: 22,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                        letterSpacing: 1.2,
-                      ),
                     ),
                   ),
                 ),
@@ -157,11 +118,7 @@ class _OnboardingNameScreenState extends State<OnboardingNameScreen> {
                   child: Text.rich(
                     TextSpan(
                       text: 'Already have an account?',
-                      style: const TextStyle(
-                        fontFamily: 'Kanit',
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                      ),
+                      style: context.textStyles.onboardingText,
                       children: [
                         const WidgetSpan(
                           child: SizedBox(width: 4),
@@ -171,11 +128,9 @@ class _OnboardingNameScreenState extends State<OnboardingNameScreen> {
                             onPressed: () {
                               print('Hehe');
                             },
-                            child: const Text(
+                            child: Text(
                               'Sign in',
-                              style: TextStyle(
-                                fontFamily: 'Kanit',
-                                fontSize: 18,
+                              style: context.textStyles.onboardingText.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
