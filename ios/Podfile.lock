@@ -9,6 +9,8 @@ PODS:
     - PhoneNumberKit/PhoneNumberKitCore (= 3.8.0)
   - flutter_native_splash (0.0.1):
     - Flutter
+  - image_picker_ios (0.0.1):
+    - Flutter
   - libphonenumber_plugin (0.0.1):
     - Flutter
     - PhoneNumberKit
@@ -33,6 +35,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_libphonenumber_ios (from `.symlinks/plugins/flutter_libphonenumber_ios/ios`)
   - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
+  - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - libphonenumber_plugin (from `.symlinks/plugins/libphonenumber_plugin/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
@@ -53,6 +56,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_libphonenumber_ios/ios"
   flutter_native_splash:
     :path: ".symlinks/plugins/flutter_native_splash/ios"
+  image_picker_ios:
+    :path: ".symlinks/plugins/image_picker_ios/ios"
   libphonenumber_plugin:
     :path: ".symlinks/plugins/libphonenumber_plugin/ios"
   path_provider_foundation:
@@ -68,6 +73,7 @@ SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_libphonenumber_ios: 5ad8620197bff91dd159d828b7544ec6956e86a1
   flutter_native_splash: edf599c81f74d093a4daf8e17bd7a018854bc778
+  image_picker_ios: c560581cceedb403a6ff17f2f816d7fea1421fc1
   libphonenumber_plugin: 48bf4078546377eedaab4aa54978cd0f6fa23072
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   PhoneNumberKit: ec00ab8cef5342c1dc49fadb99d23fa7e66cf0ef

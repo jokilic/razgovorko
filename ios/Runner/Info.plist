@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Razgovorko needs photo library permission so you can pick photos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Razgovorko needs camera permission so you can take photos.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Razgovorko needs microphone permission so you can record videos.</string>
 	<key>NSContactsUsageDescription</key>
 	<string>Razgovorko needs contacts permission to show you users.</string>
 	<key>CFBundleDevelopmentRegion</key>

@@ -14,5 +14,5 @@ class OnboardingPasswordController extends ValueNotifier<String?> {
   ///
 
   /// Check if `password` is proper
-  bool isStateProper(String? passedPassword) => (passedPassword?.length ?? 0) >= 8;
+  bool isStateProper(String? passedPassword) => (passedPassword?.trim().length ?? 0) >= 8;
 }

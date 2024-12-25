@@ -29,6 +29,7 @@ class RazgovorkoTheme {
     white: RazgovorkoColors.white,
     black: RazgovorkoColors.black,
     blue: RazgovorkoColors.blue,
+    cyan: RazgovorkoColors.cyan,
   );
 
   static final lightTextTheme = RazgovorkoTextThemesExtension(

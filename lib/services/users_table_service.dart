@@ -180,22 +180,10 @@ class UsersTableService {
     }
   }
 
-  /// Searches `display_name`, `email` and `phone_number` columns in the `users` table using the passed `query`
-  Future<List<RazgovorkoUser>?> searchUsers({required String query}) async {
+  /// Searches `international_phone_number` and `national_phone_number` columns in the `users` table using the passed `query`
+  Future<List<RazgovorkoUser>?> searchUsersByPhoneNumber({required String query}) async {
     try {
-      final userId = supabase.auth.currentUser?.id;
-
-      if (userId == null) {
-        throw Exception('Not authenticated');
-      }
-
-      final response = await supabase
-          .from('users')
-          .select()
-          .neq('id', userId)
-          .eq('is_deleted', false)
-          .or('display_name.ilike.%$query%,email.ilike.%$query%,phone_number.ilike.%$query%')
-          .order('display_name');
+      final response = await supabase.from('users').select().or('international_phone_number.ilike.%$query%').order('display_name');
 
       final users = response.isNotEmpty ? response.map((json) => RazgovorkoUser.fromMap(json)).toList() : null;
 

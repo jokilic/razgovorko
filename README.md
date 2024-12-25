@@ -13,7 +13,7 @@ Some text here...
 
 ### General To-Dos
 
-- [ ] Theme, text styles, colors, etc.
+- [ ] `OnboardingPasswordScreen` - Add little icon for seeing password
 - [ ] Introduce indexes on the tables for better performance
 - [ ] Introduce some security on the tables
 - [ ] Replace all Exceptions with returning

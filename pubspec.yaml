@@ -9,11 +9,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   country_code_picker_plus: 0.0.9
   fast_contacts: 4.0.0
+  flutter_animate: 4.5.2
   flutter_libphonenumber: 2.5.0
   get_it: 8.0.2
+  image_picker: 1.1.2
+  intl: 0.20.1
   logger: 2.4.0
   supabase_flutter: 2.8.0
   watch_it: 1.5.1
@@ -23,6 +28,9 @@ dev_dependencies:
   envied_generator: 0.5.4+1
   flutter_launcher_icons: 0.14.1
   flutter_native_splash: 2.4.2
+
+dependency_overrides:
+  intl: 0.20.1
 
 flutter:
   uses-material-design: true

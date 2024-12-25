@@ -4,6 +4,7 @@ import 'package:watch_it/watch_it.dart';
 import '../../../constants/images.dart';
 import '../../../dependencies.dart';
 import '../../../models/parsed_number.dart';
+import '../../../routing.dart';
 import '../../../services/logger_service.dart';
 import '../../../theme/theme.dart';
 import '../../../widgets/razgovorko_button.dart';
@@ -99,11 +100,12 @@ class _OnboardingPasswordScreenState extends State<OnboardingPasswordScreen> {
                 const SizedBox(height: 40),
                 RazgovorkoButton(
                   onPressed: isStateProper
-                      ? () {
-                          getIt.get<LoggerService>().f('Name -> ${widget.name}');
-                          getIt.get<LoggerService>().f('Number -> ${widget.parsedNumber}');
-                          getIt.get<LoggerService>().f('Password -> $passwordState');
-                        }
+                      ? () => openOnboardingAdditional(
+                            context,
+                            name: widget.name,
+                            parsedNumber: widget.parsedNumber,
+                            password: passwordState!,
+                          )
                       : null,
                   child: Container(
                     padding: const EdgeInsets.symmetric(

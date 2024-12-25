@@ -87,7 +87,7 @@ class _OnboardingNameScreenState extends State<OnboardingNameScreen> {
                 ),
                 const SizedBox(height: 40),
                 RazgovorkoButton(
-                  onPressed: (nameState?.isNotEmpty ?? false)
+                  onPressed: (nameState?.trim().isNotEmpty ?? false)
                       ? () => openOnboardingNumber(
                             context,
                             name: nameState!.trim(),

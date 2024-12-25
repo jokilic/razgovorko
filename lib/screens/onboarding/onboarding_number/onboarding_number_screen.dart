@@ -1,6 +1,7 @@
 import 'package:country_code_picker_plus/country_code_picker_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:watch_it/watch_it.dart';
 
 import '../../../constants/borders.dart';
@@ -8,6 +9,7 @@ import '../../../constants/images.dart';
 import '../../../dependencies.dart';
 import '../../../routing.dart';
 import '../../../services/logger_service.dart';
+import '../../../services/users_table_service.dart';
 import '../../../theme/theme.dart';
 import '../../../widgets/razgovorko_button.dart';
 import '../widgets/onboarding_text_field.dart';
@@ -24,7 +26,9 @@ class OnboardingNumberScreen extends WatchingStatefulWidget {
   State<OnboardingNumberScreen> createState() => _OnboardingNumberScreenState();
 }
 
-class _OnboardingNumberScreenState extends State<OnboardingNumberScreen> {
+class _OnboardingNumberScreenState extends State<OnboardingNumberScreen> with SingleTickerProviderStateMixin {
+  late final AnimationController buttonShakeAnimationController;
+
   @override
   void initState() {
     super.initState();
@@ -32,14 +36,20 @@ class _OnboardingNumberScreenState extends State<OnboardingNumberScreen> {
     registerIfNotInitialized<OnboardingNumberController>(
       () => OnboardingNumberController(
         logger: getIt.get<LoggerService>(),
+        usersTable: getIt.get<UsersTableService>(),
       ),
       afterRegister: (controller) => controller.init(),
+    );
+
+    buttonShakeAnimationController = AnimationController(
+      vsync: this,
     );
   }
 
   @override
   void dispose() {
     getIt.unregister<OnboardingNumberController>();
+    buttonShakeAnimationController.dispose();
     super.dispose();
   }
 
@@ -160,37 +170,58 @@ class _OnboardingNumberScreenState extends State<OnboardingNumberScreen> {
                   ),
                 ),
                 const SizedBox(height: 40),
-                RazgovorkoButton(
-                  onPressed: isStateProper
-                      ? () async {
-                          final parsedNumber = await controller.getParsedNumberFromState();
+                Animate(
+                  effects: const [
+                    ShakeEffect(),
+                  ],
+                  autoPlay: false,
+                  controller: buttonShakeAnimationController,
+                  child: RazgovorkoButton(
+                    onPressed: isStateProper
+                        ? () async {
+                            /// Try to parse number
+                            final parsedNumber = await controller.getParsedNumberFromState();
 
-                          if (parsedNumber != null) {
-                            openOnboardingPassword(
-                              context,
-                              name: widget.name,
-                              parsedNumber: parsedNumber,
-                            );
+                            /// Number is proper, check if user exists
+                            if (parsedNumber != null) {
+                              final userExists = await controller.getUserExistsInDatabase(
+                                parsedNumber: parsedNumber,
+                              );
+
+                              if (!userExists) {
+                                openOnboardingPassword(
+                                  context,
+                                  name: widget.name,
+                                  parsedNumber: parsedNumber,
+                                );
+                              } else {
+                                buttonShakeAnimationController.reset();
+                                await buttonShakeAnimationController.forward();
+                              }
+                            } else {
+                              buttonShakeAnimationController.reset();
+                              await buttonShakeAnimationController.forward();
+                            }
                           }
-                        }
-                      : null,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 24,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(32),
-                      border: Border.all(
-                        width: 2.5,
-                        color: context.colors.blue.withOpacity(isStateProper ? 1 : 0.25),
+                        : null,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 24,
                       ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Continue',
-                      style: context.textStyles.onboardingButton,
-                      textAlign: TextAlign.center,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(32),
+                        border: Border.all(
+                          width: 2.5,
+                          color: context.colors.blue.withOpacity(isStateProper ? 1 : 0.25),
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Continue',
+                        style: context.textStyles.onboardingButton,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 ),

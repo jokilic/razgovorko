@@ -3,12 +3,15 @@ import 'package:flutter_libphonenumber/flutter_libphonenumber.dart' as libphonen
 
 import '../../../models/parsed_number.dart';
 import '../../../services/logger_service.dart';
+import '../../../services/users_table_service.dart';
 
 class OnboardingNumberController extends ValueNotifier<({String? countryCode, String? number})> {
   final LoggerService logger;
+  final UsersTableService usersTable;
 
   OnboardingNumberController({
     required this.logger,
+    required this.usersTable,
   }) : super((countryCode: null, number: null));
 
   ///
@@ -58,5 +61,14 @@ class OnboardingNumberController extends ValueNotifier<({String? countryCode, St
       logger.e('OnboardingNumberController -> parsePhoneNumber() -> $e');
       return null;
     }
+  }
+
+  /// Checks if any user in the database is registered with the passed phone number
+  Future<bool> getUserExistsInDatabase({required ParsedNumber parsedNumber}) async {
+    final result = await usersTable.searchUsersByPhoneNumber(
+      query: parsedNumber.international,
+    );
+
+    return result?.isNotEmpty ?? false;
   }
 }
