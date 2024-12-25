@@ -17,6 +17,7 @@ class OnboardingTextField extends StatelessWidget {
   final Widget? prefix;
   final String labelText;
   final int? maxLines;
+  final TextCapitalization textCapitalization;
 
   const OnboardingTextField({
     required this.keyboardType,
@@ -29,6 +30,7 @@ class OnboardingTextField extends StatelessWidget {
     this.autofocus = false,
     this.obscureText = false,
     this.maxLines = 1,
+    this.textCapitalization = TextCapitalization.sentences,
     this.inputFormatters,
     this.prefix,
   });
@@ -50,6 +52,7 @@ class OnboardingTextField extends StatelessWidget {
         keyboardType: keyboardType,
         textInputAction: textInputAction,
         style: context.textStyles.onboardingTextField,
+        textCapitalization: textCapitalization,
         decoration: InputDecoration(
           prefix: prefix,
           isCollapsed: true,

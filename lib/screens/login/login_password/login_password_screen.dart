@@ -177,7 +177,7 @@ class _LoginPasswordScreenState extends State<LoginPasswordScreen> with SingleTi
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(height: bottomSpacing),
+                SizedBox(height: bottomSpacing + 24),
               ],
             ),
           ),

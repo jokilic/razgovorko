@@ -269,7 +269,7 @@ class _OnboardingNumberScreenState extends State<OnboardingNumberScreen> with Si
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(height: bottomSpacing),
+                SizedBox(height: bottomSpacing + 24),
               ],
             ),
           ),

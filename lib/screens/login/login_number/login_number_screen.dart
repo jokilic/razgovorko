@@ -246,7 +246,7 @@ class _LoginScreenState extends State<LoginNumberScreen> with SingleTickerProvid
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(height: bottomSpacing),
+                SizedBox(height: bottomSpacing + 24),
               ],
             ),
           ),

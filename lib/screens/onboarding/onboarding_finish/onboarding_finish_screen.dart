@@ -377,7 +377,7 @@ class _OnboardingFinishScreenState extends State<OnboardingFinishScreen> with Si
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    SizedBox(height: bottomSpacing),
+                    SizedBox(height: bottomSpacing + 24),
                   ],
                 ),
               ],

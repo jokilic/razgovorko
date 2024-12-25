@@ -168,7 +168,7 @@ class _OnboardingPasswordScreenState extends State<OnboardingPasswordScreen> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(height: bottomSpacing),
+                SizedBox(height: bottomSpacing + 24),
               ],
             ),
           ),

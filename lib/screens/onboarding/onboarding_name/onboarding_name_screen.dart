@@ -162,7 +162,7 @@ class _OnboardingNameScreenState extends State<OnboardingNameScreen> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(height: bottomSpacing),
+                SizedBox(height: bottomSpacing + 24),
               ],
             ),
           ),

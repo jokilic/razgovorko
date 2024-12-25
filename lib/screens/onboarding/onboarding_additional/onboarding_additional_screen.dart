@@ -238,7 +238,7 @@ class _OnboardingAdditionalScreenState extends State<OnboardingAdditionalScreen>
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(height: bottomSpacing),
+                SizedBox(height: bottomSpacing + 24),
               ],
             ),
           ),
