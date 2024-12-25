@@ -43,13 +43,34 @@ class _OnboardingNameScreenState extends State<OnboardingNameScreen> {
 
     return Scaffold(
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          ///
+          /// BACK
+          ///
+          IgnorePointer(
+            child: Opacity(
+              opacity: 0,
+              child: Padding(
+                padding: EdgeInsets.only(top: topSpacing + 16, left: 16),
+                child: RazgovorkoButton(
+                  onPressed: Navigator.of(context).pop,
+                  child: Icon(
+                    Icons.arrow_back_rounded,
+                    size: 36,
+                    color: context.colors.black,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
           ///
           /// HEADER IMAGE
           ///
           Expanded(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(40, topSpacing, 40, bottomSpacing),
+              padding: EdgeInsets.fromLTRB(40, 0, 40, bottomSpacing),
               child: Image.asset(
                 RazgovorkoImages.illustration1,
               ),
@@ -108,7 +129,9 @@ class _OnboardingNameScreenState extends State<OnboardingNameScreen> {
                     alignment: Alignment.center,
                     child: Text(
                       'Get started',
-                      style: context.textStyles.onboardingButton,
+                      style: context.textStyles.onboardingButton.copyWith(
+                        color: context.colors.black.withOpacity((nameState?.isNotEmpty ?? false) ? 1 : 0.25),
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -125,9 +148,7 @@ class _OnboardingNameScreenState extends State<OnboardingNameScreen> {
                         ),
                         WidgetSpan(
                           child: RazgovorkoButton(
-                            onPressed: () {
-                              print('Hehe');
-                            },
+                            onPressed: () => openLoginNumber(context),
                             child: Text(
                               'Sign in',
                               style: context.textStyles.onboardingText.copyWith(

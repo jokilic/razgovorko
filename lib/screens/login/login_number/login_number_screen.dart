@@ -4,37 +4,31 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:watch_it/watch_it.dart';
 
-import '../../../constants/borders.dart';
-import '../../../constants/images.dart';
-import '../../../dependencies.dart';
-import '../../../routing.dart';
-import '../../../services/logger_service.dart';
-import '../../../services/users_table_service.dart';
-import '../../../theme/theme.dart';
-import '../../../widgets/razgovorko_button.dart';
-import '../widgets/onboarding_text_field.dart';
-import 'onboarding_number_controller.dart';
+import '../../../../constants/borders.dart';
+import '../../../../constants/images.dart';
+import '../../../../dependencies.dart';
+import '../../../../routing.dart';
+import '../../../../services/logger_service.dart';
+import '../../../../services/users_table_service.dart';
+import '../../../../theme/theme.dart';
+import '../../../../widgets/razgovorko_button.dart';
+import '../../onboarding/widgets/onboarding_text_field.dart';
+import 'login_number_controller.dart';
 
-class OnboardingNumberScreen extends WatchingStatefulWidget {
-  final String name;
-
-  const OnboardingNumberScreen({
-    required this.name,
-  });
-
+class LoginNumberScreen extends WatchingStatefulWidget {
   @override
-  State<OnboardingNumberScreen> createState() => _OnboardingNumberScreenState();
+  State<LoginNumberScreen> createState() => _LoginScreenState();
 }
 
-class _OnboardingNumberScreenState extends State<OnboardingNumberScreen> with SingleTickerProviderStateMixin {
+class _LoginScreenState extends State<LoginNumberScreen> with SingleTickerProviderStateMixin {
   late final AnimationController buttonShakeAnimationController;
 
   @override
   void initState() {
     super.initState();
 
-    registerIfNotInitialized<OnboardingNumberController>(
-      () => OnboardingNumberController(
+    registerIfNotInitialized<LoginNumberController>(
+      () => LoginNumberController(
         logger: getIt.get<LoggerService>(),
         usersTable: getIt.get<UsersTableService>(),
       ),
@@ -48,15 +42,15 @@ class _OnboardingNumberScreenState extends State<OnboardingNumberScreen> with Si
 
   @override
   void dispose() {
-    getIt.unregister<OnboardingNumberController>();
+    getIt.unregister<LoginNumberController>();
     buttonShakeAnimationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = getIt.get<OnboardingNumberController>();
-    final numberState = watchIt<OnboardingNumberController>().value;
+    final controller = getIt.get<LoginNumberController>();
+    final numberState = watchIt<LoginNumberController>().value;
 
     final isStateProper = controller.isStateProper(numberState);
 
@@ -65,29 +59,13 @@ class _OnboardingNumberScreenState extends State<OnboardingNumberScreen> with Si
 
     return Scaffold(
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ///
-          /// BACK
-          ///
-          Padding(
-            padding: EdgeInsets.only(top: topSpacing + 16, left: 16),
-            child: RazgovorkoButton(
-              onPressed: Navigator.of(context).pop,
-              child: Icon(
-                Icons.arrow_back_rounded,
-                size: 36,
-                color: context.colors.black,
-              ),
-            ),
-          ),
-
           ///
           /// HEADER IMAGE
           ///
           Expanded(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(40, 0, 40, bottomSpacing),
+              padding: EdgeInsets.fromLTRB(40, topSpacing, 40, bottomSpacing),
               child: Image.asset(
                 RazgovorkoImages.illustration2,
               ),
@@ -204,10 +182,9 @@ class _OnboardingNumberScreenState extends State<OnboardingNumberScreen> with Si
                                 parsedNumber: parsedNumber,
                               );
 
-                              if (!userExists) {
-                                openOnboardingPassword(
+                              if (userExists) {
+                                openLoginPassword(
                                   context,
-                                  name: widget.name,
                                   parsedNumber: parsedNumber,
                                 );
                               } else {
@@ -247,7 +224,7 @@ class _OnboardingNumberScreenState extends State<OnboardingNumberScreen> with Si
                 Center(
                   child: Text.rich(
                     TextSpan(
-                      text: 'Already have an account?',
+                      text: "Don't have an account?",
                       style: context.textStyles.onboardingText,
                       children: [
                         const WidgetSpan(
@@ -255,9 +232,9 @@ class _OnboardingNumberScreenState extends State<OnboardingNumberScreen> with Si
                         ),
                         WidgetSpan(
                           child: RazgovorkoButton(
-                            onPressed: () => openLoginNumber(context),
+                            onPressed: () => openOnboardingName(context),
                             child: Text(
-                              'Sign in',
+                              'Sign up',
                               style: context.textStyles.onboardingText.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),

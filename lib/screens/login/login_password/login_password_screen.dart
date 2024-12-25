@@ -1,51 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:watch_it/watch_it.dart';
 
 import '../../../constants/images.dart';
 import '../../../dependencies.dart';
 import '../../../models/parsed_number.dart';
 import '../../../routing.dart';
+import '../../../services/auth_service.dart';
 import '../../../services/logger_service.dart';
 import '../../../theme/theme.dart';
 import '../../../widgets/razgovorko_button.dart';
-import '../widgets/onboarding_text_field.dart';
-import 'onboarding_password_controller.dart';
+import '../../onboarding/widgets/onboarding_text_field.dart';
+import 'login_password_controller.dart';
 
-class OnboardingPasswordScreen extends WatchingStatefulWidget {
-  final String name;
+class LoginPasswordScreen extends WatchingStatefulWidget {
   final ParsedNumber parsedNumber;
 
-  const OnboardingPasswordScreen({
-    required this.name,
+  const LoginPasswordScreen({
     required this.parsedNumber,
   });
 
   @override
-  State<OnboardingPasswordScreen> createState() => _OnboardingPasswordScreenState();
+  State<LoginPasswordScreen> createState() => _LoginPasswordScreenState();
 }
 
-class _OnboardingPasswordScreenState extends State<OnboardingPasswordScreen> {
+class _LoginPasswordScreenState extends State<LoginPasswordScreen> with SingleTickerProviderStateMixin {
+  late final AnimationController buttonShakeAnimationController;
+
   @override
   void initState() {
     super.initState();
 
-    registerIfNotInitialized<OnboardingPasswordController>(
-      () => OnboardingPasswordController(
+    registerIfNotInitialized<LoginPasswordController>(
+      () => LoginPasswordController(
         logger: getIt.get<LoggerService>(),
+        auth: getIt.get<AuthService>(),
       ),
+    );
+
+    buttonShakeAnimationController = AnimationController(
+      vsync: this,
     );
   }
 
   @override
   void dispose() {
-    getIt.unregister<OnboardingPasswordController>();
+    getIt.unregister<LoginPasswordController>();
+    buttonShakeAnimationController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = getIt.get<OnboardingPasswordController>();
-    final passwordState = watchIt<OnboardingPasswordController>().value;
+    final controller = getIt.get<LoginPasswordController>();
+    final passwordState = watchIt<LoginPasswordController>().value;
 
     final isStateProper = controller.isStateProper(passwordState);
 
@@ -54,26 +62,13 @@ class _OnboardingPasswordScreenState extends State<OnboardingPasswordScreen> {
 
     return Scaffold(
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: EdgeInsets.only(top: topSpacing + 16, left: 16),
-            child: RazgovorkoButton(
-              onPressed: Navigator.of(context).pop,
-              child: Icon(
-                Icons.arrow_back_rounded,
-                size: 36,
-                color: context.colors.black,
-              ),
-            ),
-          ),
-
           ///
           /// HEADER IMAGE
           ///
           Expanded(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(40, 0, 40, bottomSpacing),
+              padding: EdgeInsets.fromLTRB(40, topSpacing, 40, bottomSpacing),
               child: Image.asset(
                 RazgovorkoImages.illustration4,
               ),
@@ -111,34 +106,48 @@ class _OnboardingPasswordScreenState extends State<OnboardingPasswordScreen> {
                   labelText: 'Type your password...',
                 ),
                 const SizedBox(height: 40),
-                RazgovorkoButton(
-                  onPressed: isStateProper
-                      ? () => openOnboardingAdditional(
-                            context,
-                            name: widget.name,
-                            parsedNumber: widget.parsedNumber,
-                            password: passwordState!,
-                          )
-                      : null,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 24,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(32),
-                      border: Border.all(
-                        width: 2.5,
-                        color: context.colors.blue.withOpacity(isStateProper ? 1 : 0.25),
+                Animate(
+                  effects: const [
+                    ShakeEffect(),
+                  ],
+                  autoPlay: false,
+                  controller: buttonShakeAnimationController,
+                  child: RazgovorkoButton(
+                    onPressed: isStateProper
+                        ? () async {
+                            final user = await controller.signIn(
+                              email: '${widget.parsedNumber.international.replaceAll(' ', '')}@razgovorko.com',
+                              password: passwordState!.trim(),
+                            );
+
+                            if (user != null) {
+                              openChat(context);
+                            } else {
+                              buttonShakeAnimationController.reset();
+                              await buttonShakeAnimationController.forward();
+                            }
+                          }
+                        : null,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 24,
                       ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Continue',
-                      style: context.textStyles.onboardingButton.copyWith(
-                        color: context.colors.black.withOpacity(isStateProper ? 1 : 0.25),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(32),
+                        border: Border.all(
+                          width: 2.5,
+                          color: context.colors.blue.withOpacity(isStateProper ? 1 : 0.25),
+                        ),
                       ),
-                      textAlign: TextAlign.center,
+                      alignment: Alignment.center,
+                      child: Text(
+                        'Login',
+                        style: context.textStyles.onboardingButton.copyWith(
+                          color: context.colors.black.withOpacity(isStateProper ? 1 : 0.25),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 ),
@@ -146,7 +155,7 @@ class _OnboardingPasswordScreenState extends State<OnboardingPasswordScreen> {
                 Center(
                   child: Text.rich(
                     TextSpan(
-                      text: 'Already have an account?',
+                      text: "Don't have an account?",
                       style: context.textStyles.onboardingText,
                       children: [
                         const WidgetSpan(
@@ -154,9 +163,9 @@ class _OnboardingPasswordScreenState extends State<OnboardingPasswordScreen> {
                         ),
                         WidgetSpan(
                           child: RazgovorkoButton(
-                            onPressed: () => openLoginNumber(context),
+                            onPressed: () => openOnboardingName(context),
                             child: Text(
-                              'Sign in',
+                              'Sign up',
                               style: context.textStyles.onboardingText.copyWith(
                                 fontWeight: FontWeight.w600,
                               ),

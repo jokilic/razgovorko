@@ -6,6 +6,7 @@ import 'package:watch_it/watch_it.dart';
 import '../../../constants/images.dart';
 import '../../../dependencies.dart';
 import '../../../models/parsed_number.dart';
+import '../../../routing.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/logger_service.dart';
 import '../../../services/users_table_service.dart';
@@ -74,263 +75,313 @@ class _OnboardingFinishScreenState extends State<OnboardingFinishScreen> with Si
 
     return Scaffold(
       body: ListView(
-        padding: EdgeInsets.fromLTRB(
-          24,
-          topSpacing + 24,
-          24,
-          bottomSpacing,
-        ),
+        padding: EdgeInsets.zero,
         physics: const BouncingScrollPhysics(),
         children: [
-          ///
-          /// HEADER IMAGE
-          ///
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: Image.asset(
-              RazgovorkoImages.illustration5,
+          Container(
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.only(
+              top: topSpacing + 16,
+              left: 16,
+              bottom: 24,
+            ),
+            child: RazgovorkoButton(
+              onPressed: Navigator.of(context).pop,
+              child: Icon(
+                Icons.arrow_back_rounded,
+                size: 36,
+                color: context.colors.black,
+              ),
             ),
           ),
-          SizedBox(height: bottomSpacing),
-
-          ///
-          /// CONTENT
-          ///
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Congratulations',
-                style: context.textStyles.onboardingTitle,
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'You have registered successfully',
-                style: context.textStyles.onboardingText,
-              ),
-              const SizedBox(height: 32),
-              Card(
-                color: context.colors.cyan,
-                shape: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      ///
-                      /// NAME
-                      ///
-                      Text(
-                        'Name'.toUpperCase(),
-                        style: TextStyle(
-                          fontFamily: 'Kanit',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.8,
-                          color: context.colors.black.withOpacity(0.4),
-                        ),
-                      ),
-                      Text(
-                        widget.name,
-                        style: TextStyle(
-                          fontFamily: 'Kanit',
-                          fontSize: 22,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 1.4,
-                          color: context.colors.black,
-                        ),
-                      ),
-
-                      ///
-                      /// NUMBER
-                      ///
-                      const SizedBox(height: 24),
-                      Text(
-                        'Number'.toUpperCase(),
-                        style: TextStyle(
-                          fontFamily: 'Kanit',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.8,
-                          color: context.colors.black.withOpacity(0.4),
-                        ),
-                      ),
-                      Text(
-                        widget.parsedNumber.international,
-                        style: TextStyle(
-                          fontFamily: 'Kanit',
-                          fontSize: 22,
-                          fontWeight: FontWeight.w500,
-                          letterSpacing: 1.4,
-                          color: context.colors.black,
-                        ),
-                      ),
-
-                      ///
-                      /// ABOUT YOU
-                      ///
-                      if (widget.aboutMe != null) ...[
-                        const SizedBox(height: 24),
-                        Text(
-                          'About you'.toUpperCase(),
-                          style: TextStyle(
-                            fontFamily: 'Kanit',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.8,
-                            color: context.colors.black.withOpacity(0.4),
-                          ),
-                        ),
-                        Text(
-                          widget.aboutMe!,
-                          style: TextStyle(
-                            fontFamily: 'Kanit',
-                            fontSize: 22,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 1.4,
-                            color: context.colors.black,
-                          ),
-                        ),
-                      ],
-
-                      ///
-                      /// THOUGHTS
-                      ///
-                      if (widget.status != null) ...[
-                        const SizedBox(height: 24),
-                        Text(
-                          'Your thoughts'.toUpperCase(),
-                          style: TextStyle(
-                            fontFamily: 'Kanit',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.8,
-                            color: context.colors.black.withOpacity(0.4),
-                          ),
-                        ),
-                        Text(
-                          widget.status!,
-                          style: TextStyle(
-                            fontFamily: 'Kanit',
-                            fontSize: 22,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 1.4,
-                            color: context.colors.black,
-                          ),
-                        ),
-                      ],
-
-                      ///
-                      /// LOCATION
-                      ///
-                      if (widget.location != null) ...[
-                        const SizedBox(height: 24),
-                        Text(
-                          'Your location'.toUpperCase(),
-                          style: TextStyle(
-                            fontFamily: 'Kanit',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.8,
-                            color: context.colors.black.withOpacity(0.4),
-                          ),
-                        ),
-                        Text(
-                          widget.location!,
-                          style: TextStyle(
-                            fontFamily: 'Kanit',
-                            fontSize: 22,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 1.4,
-                            color: context.colors.black,
-                          ),
-                        ),
-                      ],
-
-                      ///
-                      /// DATE OF BIRTH
-                      ///
-                      if (widget.dateOfBirth != null) ...[
-                        const SizedBox(height: 24),
-                        Text(
-                          'Date of birth'.toUpperCase(),
-                          style: TextStyle(
-                            fontFamily: 'Kanit',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.8,
-                            color: context.colors.black.withOpacity(0.4),
-                          ),
-                        ),
-                        Text(
-                          DateFormat(
-                            'd. MMMM yyyy.',
-                            'hr',
-                          ).format(widget.dateOfBirth!),
-                          style: TextStyle(
-                            fontFamily: 'Kanit',
-                            fontSize: 22,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 1.4,
-                            color: context.colors.black,
-                          ),
-                        ),
-                      ],
-                    ],
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              24,
+              0,
+              24,
+              bottomSpacing,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ///
+                /// HEADER IMAGE
+                ///
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child: Image.asset(
+                    RazgovorkoImages.illustration5,
                   ),
                 ),
-              ),
-              const SizedBox(height: 40),
-              Animate(
-                effects: const [
-                  ShakeEffect(),
-                ],
-                autoPlay: false,
-                controller: buttonShakeAnimationController,
-                child: RazgovorkoButton(
-                  onPressed: () async {
-                    final isRegistered = await controller.registerUser(
-                      displayName: widget.name,
-                      parsedNumber: widget.parsedNumber,
-                      password: widget.password,
-                      avatarUrl: widget.avatarUrl,
-                      aboutMe: widget.aboutMe,
-                      status: widget.status,
-                      location: widget.location,
-                      dateOfBirth: widget.dateOfBirth,
-                    );
+                SizedBox(height: bottomSpacing),
 
-                    if (!isRegistered) {
-                      buttonShakeAnimationController.reset();
-                      await buttonShakeAnimationController.forward();
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 24,
+                ///
+                /// CONTENT
+                ///
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Congratulations',
+                      style: context.textStyles.onboardingTitle,
                     ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(32),
-                      border: Border.all(
-                        width: 2.5,
-                        color: context.colors.blue,
+                    const SizedBox(height: 6),
+                    Text(
+                      'You have registered successfully',
+                      style: context.textStyles.onboardingText,
+                    ),
+                    const SizedBox(height: 32),
+                    Card(
+                      color: context.colors.cyan,
+                      shape: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide.none,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ///
+                            /// NAME
+                            ///
+                            Text(
+                              'Name'.toUpperCase(),
+                              style: TextStyle(
+                                fontFamily: 'Kanit',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.8,
+                                color: context.colors.black.withOpacity(0.4),
+                              ),
+                            ),
+                            Text(
+                              widget.name,
+                              style: TextStyle(
+                                fontFamily: 'Kanit',
+                                fontSize: 22,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 1.4,
+                                color: context.colors.black,
+                              ),
+                            ),
+
+                            ///
+                            /// NUMBER
+                            ///
+                            const SizedBox(height: 24),
+                            Text(
+                              'Number'.toUpperCase(),
+                              style: TextStyle(
+                                fontFamily: 'Kanit',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.8,
+                                color: context.colors.black.withOpacity(0.4),
+                              ),
+                            ),
+                            Text(
+                              widget.parsedNumber.international,
+                              style: TextStyle(
+                                fontFamily: 'Kanit',
+                                fontSize: 22,
+                                fontWeight: FontWeight.w500,
+                                letterSpacing: 1.4,
+                                color: context.colors.black,
+                              ),
+                            ),
+
+                            ///
+                            /// ABOUT YOU
+                            ///
+                            if (widget.aboutMe != null) ...[
+                              const SizedBox(height: 24),
+                              Text(
+                                'About you'.toUpperCase(),
+                                style: TextStyle(
+                                  fontFamily: 'Kanit',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.8,
+                                  color: context.colors.black.withOpacity(0.4),
+                                ),
+                              ),
+                              Text(
+                                widget.aboutMe!,
+                                style: TextStyle(
+                                  fontFamily: 'Kanit',
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 1.4,
+                                  color: context.colors.black,
+                                ),
+                              ),
+                            ],
+
+                            ///
+                            /// THOUGHTS
+                            ///
+                            if (widget.status != null) ...[
+                              const SizedBox(height: 24),
+                              Text(
+                                'Your thoughts'.toUpperCase(),
+                                style: TextStyle(
+                                  fontFamily: 'Kanit',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.8,
+                                  color: context.colors.black.withOpacity(0.4),
+                                ),
+                              ),
+                              Text(
+                                widget.status!,
+                                style: TextStyle(
+                                  fontFamily: 'Kanit',
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 1.4,
+                                  color: context.colors.black,
+                                ),
+                              ),
+                            ],
+
+                            ///
+                            /// LOCATION
+                            ///
+                            if (widget.location != null) ...[
+                              const SizedBox(height: 24),
+                              Text(
+                                'Your location'.toUpperCase(),
+                                style: TextStyle(
+                                  fontFamily: 'Kanit',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.8,
+                                  color: context.colors.black.withOpacity(0.4),
+                                ),
+                              ),
+                              Text(
+                                widget.location!,
+                                style: TextStyle(
+                                  fontFamily: 'Kanit',
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 1.4,
+                                  color: context.colors.black,
+                                ),
+                              ),
+                            ],
+
+                            ///
+                            /// DATE OF BIRTH
+                            ///
+                            if (widget.dateOfBirth != null) ...[
+                              const SizedBox(height: 24),
+                              Text(
+                                'Date of birth'.toUpperCase(),
+                                style: TextStyle(
+                                  fontFamily: 'Kanit',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.8,
+                                  color: context.colors.black.withOpacity(0.4),
+                                ),
+                              ),
+                              Text(
+                                DateFormat(
+                                  'd. MMMM yyyy.',
+                                  'hr',
+                                ).format(widget.dateOfBirth!),
+                                style: TextStyle(
+                                  fontFamily: 'Kanit',
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: 1.4,
+                                  color: context.colors.black,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Start chattin'",
-                      style: context.textStyles.onboardingButton,
-                      textAlign: TextAlign.center,
+                    const SizedBox(height: 40),
+                    Animate(
+                      effects: const [
+                        ShakeEffect(),
+                      ],
+                      autoPlay: false,
+                      controller: buttonShakeAnimationController,
+                      child: RazgovorkoButton(
+                        onPressed: () async {
+                          final isRegistered = await controller.registerUser(
+                            displayName: widget.name,
+                            parsedNumber: widget.parsedNumber,
+                            password: widget.password,
+                            avatarUrl: widget.avatarUrl,
+                            aboutMe: widget.aboutMe,
+                            status: widget.status,
+                            location: widget.location,
+                            dateOfBirth: widget.dateOfBirth,
+                          );
+
+                          if (!isRegistered) {
+                            buttonShakeAnimationController.reset();
+                            await buttonShakeAnimationController.forward();
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 24,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(32),
+                            border: Border.all(
+                              width: 2.5,
+                              color: context.colors.blue,
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Create account',
+                            style: context.textStyles.onboardingButton,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 24),
+                    Center(
+                      child: Text.rich(
+                        TextSpan(
+                          text: 'Already have an account?',
+                          style: context.textStyles.onboardingText,
+                          children: [
+                            const WidgetSpan(
+                              child: SizedBox(width: 4),
+                            ),
+                            WidgetSpan(
+                              child: RazgovorkoButton(
+                                onPressed: () => openLoginNumber(context),
+                                child: Text(
+                                  'Sign in',
+                                  style: context.textStyles.onboardingText.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    SizedBox(height: bottomSpacing),
+                  ],
                 ),
-              ),
-              SizedBox(height: bottomSpacing),
-            ],
+              ],
+            ),
           ),
         ],
       ),

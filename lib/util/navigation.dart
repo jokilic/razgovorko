@@ -3,23 +3,39 @@ import 'package:flutter/material.dart';
 Future<T?> pushScreen<T>(
   Widget screen, {
   required BuildContext context,
+  bool popEverything = false,
   bool isCircularTransition = false,
   Duration? transitionDuration,
   Duration? reverseTransitionDuration,
 }) =>
-    Navigator.of(context).push<T>(
-      isCircularTransition
-          ? circularPageTransition(
-              screen,
-              transitionDuration: transitionDuration,
-              reverseTransitionDuration: reverseTransitionDuration,
-            )
-          : fadePageTransition(
-              screen,
-              transitionDuration: transitionDuration,
-              reverseTransitionDuration: reverseTransitionDuration,
-            ),
-    );
+    popEverything
+        ? Navigator.of(context).pushAndRemoveUntil(
+            isCircularTransition
+                ? circularPageTransition(
+                    screen,
+                    transitionDuration: transitionDuration,
+                    reverseTransitionDuration: reverseTransitionDuration,
+                  )
+                : fadePageTransition(
+                    screen,
+                    transitionDuration: transitionDuration,
+                    reverseTransitionDuration: reverseTransitionDuration,
+                  ),
+            (route) => false,
+          )
+        : Navigator.of(context).push<T>(
+            isCircularTransition
+                ? circularPageTransition(
+                    screen,
+                    transitionDuration: transitionDuration,
+                    reverseTransitionDuration: reverseTransitionDuration,
+                  )
+                : fadePageTransition(
+                    screen,
+                    transitionDuration: transitionDuration,
+                    reverseTransitionDuration: reverseTransitionDuration,
+                  ),
+          );
 
 Route<T> fadePageTransition<T>(
   Widget screen, {
@@ -89,5 +105,5 @@ class CircularTransitionClipper extends CustomClipper<Path> {
     );
 
   @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => true;
+  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }

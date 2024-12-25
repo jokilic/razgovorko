@@ -5,6 +5,8 @@ import 'models/parsed_number.dart';
 import 'models/user.dart';
 import 'screens/chat/chat_screen.dart';
 import 'screens/conversation/conversation_screen.dart';
+import 'screens/login/login_number/login_number_screen.dart';
+import 'screens/login/login_password/login_password_screen.dart';
 import 'screens/onboarding/onboarding_additional/onboarding_additional_screen.dart';
 import 'screens/onboarding/onboarding_finish/onboarding_finish_screen.dart';
 import 'screens/onboarding/onboarding_name/onboarding_name_screen.dart';
@@ -12,10 +14,30 @@ import 'screens/onboarding/onboarding_number/onboarding_number_screen.dart';
 import 'screens/onboarding/onboarding_password/onboarding_password_screen.dart';
 import 'util/navigation.dart';
 
+/// Opens [LoginNumberScreen]
+void openLoginNumber(BuildContext context) => pushScreen(
+      LoginNumberScreen(),
+      context: context,
+      popEverything: true,
+    );
+
+/// Opens [LoginPasswordScreen]
+void openLoginPassword(
+  BuildContext context, {
+  required ParsedNumber parsedNumber,
+}) =>
+    pushScreen(
+      LoginPasswordScreen(
+        parsedNumber: parsedNumber,
+      ),
+      context: context,
+    );
+
 /// Opens [OnboardingNameScreen]
 void openOnboardingName(BuildContext context) => pushScreen(
       OnboardingNameScreen(),
       context: context,
+      popEverything: true,
     );
 
 /// Opens [OnboardingNumberScreen]
@@ -90,6 +112,7 @@ void openOnboardingFinish(
 void openChat(BuildContext context) => pushScreen(
       ChatScreen(),
       context: context,
+      popEverything: true,
     );
 
 /// Opens [ConversationScreen]

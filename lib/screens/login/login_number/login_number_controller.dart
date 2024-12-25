@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_libphonenumber/flutter_libphonenumber.dart' as libphonenumber;
 
-import '../../../models/parsed_number.dart';
-import '../../../services/logger_service.dart';
-import '../../../services/users_table_service.dart';
+import '../../../../models/parsed_number.dart';
+import '../../../../services/logger_service.dart';
+import '../../../../services/users_table_service.dart';
 
-class OnboardingNumberController extends ValueNotifier<({String? countryCode, String? number})> {
+class LoginNumberController extends ValueNotifier<({String? countryCode, String? number})> {
   final LoggerService logger;
   final UsersTableService usersTable;
 
-  OnboardingNumberController({
+  LoginNumberController({
     required this.logger,
     required this.usersTable,
   }) : super((countryCode: null, number: null));
@@ -54,11 +54,11 @@ class OnboardingNumberController extends ValueNotifier<({String? countryCode, St
       final number = await libphonenumber.parse(phoneNumber);
       final parsedNumber = ParsedNumber.fromMap(number);
 
-      logger.t('OnboardingNumberController -> parsePhoneNumber() -> success!');
+      logger.t('LoginController -> parsePhoneNumber() -> success!');
 
       return parsedNumber;
     } catch (e) {
-      logger.e('OnboardingNumberController -> parsePhoneNumber() -> $e');
+      logger.e('LoginController -> parsePhoneNumber() -> $e');
       return null;
     }
   }
