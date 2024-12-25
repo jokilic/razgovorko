@@ -66,11 +66,15 @@ class _LoginScreenState extends State<LoginNumberScreen> with SingleTickerProvid
           Expanded(
             child: Padding(
               padding: EdgeInsets.fromLTRB(40, topSpacing, 40, bottomSpacing),
-              child: Image.asset(
-                RazgovorkoImages.illustration2,
+              child: Center(
+                child: Image.asset(
+                  RazgovorkoImages.illustration2,
+                ),
               ),
             ),
           ),
+
+          const SizedBox(height: 24),
 
           ///
           /// CONTENT
@@ -96,13 +100,12 @@ class _LoginScreenState extends State<LoginNumberScreen> with SingleTickerProvid
                 ),
                 const SizedBox(height: 4),
                 OnboardingTextField(
-                  autofocus: true,
                   onChanged: (newNumber) => controller.updateState(
                     newNumber: newNumber,
                   ),
                   keyboardType: TextInputType.phone,
                   textInputAction: TextInputAction.done,
-                  labelText: 'Type your country...',
+                  labelText: 'Add your number...',
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
                   ],

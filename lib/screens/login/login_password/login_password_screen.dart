@@ -69,11 +69,15 @@ class _LoginPasswordScreenState extends State<LoginPasswordScreen> with SingleTi
           Expanded(
             child: Padding(
               padding: EdgeInsets.fromLTRB(40, topSpacing, 40, bottomSpacing),
-              child: Image.asset(
-                RazgovorkoImages.illustration4,
+              child: Center(
+                child: Image.asset(
+                  RazgovorkoImages.illustration4,
+                ),
               ),
             ),
           ),
+
+          const SizedBox(height: 24),
 
           ///
           /// CONTENT

@@ -109,11 +109,14 @@ class _OnboardingFinishScreenState extends State<OnboardingFinishScreen> with Si
                 ///
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: Image.asset(
-                    RazgovorkoImages.illustration5,
+                  child: Center(
+                    child: Image.asset(
+                      RazgovorkoImages.illustration5,
+                    ),
                   ),
                 ),
-                SizedBox(height: bottomSpacing),
+
+                const SizedBox(height: 24),
 
                 ///
                 /// CONTENT

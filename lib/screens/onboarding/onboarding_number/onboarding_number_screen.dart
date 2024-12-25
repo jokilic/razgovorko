@@ -88,11 +88,15 @@ class _OnboardingNumberScreenState extends State<OnboardingNumberScreen> with Si
           Expanded(
             child: Padding(
               padding: EdgeInsets.fromLTRB(40, 0, 40, bottomSpacing),
-              child: Image.asset(
-                RazgovorkoImages.illustration2,
+              child: Center(
+                child: Image.asset(
+                  RazgovorkoImages.illustration2,
+                ),
               ),
             ),
           ),
+
+          const SizedBox(height: 24),
 
           ///
           /// CONTENT
@@ -118,13 +122,12 @@ class _OnboardingNumberScreenState extends State<OnboardingNumberScreen> with Si
                 ),
                 const SizedBox(height: 4),
                 OnboardingTextField(
-                  autofocus: true,
                   onChanged: (newNumber) => controller.updateState(
                     newNumber: newNumber,
                   ),
                   keyboardType: TextInputType.phone,
                   textInputAction: TextInputAction.done,
-                  labelText: 'Type your country...',
+                  labelText: 'Add your number...',
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
                   ],

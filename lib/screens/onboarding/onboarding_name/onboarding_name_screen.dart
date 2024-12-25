@@ -71,11 +71,15 @@ class _OnboardingNameScreenState extends State<OnboardingNameScreen> {
           Expanded(
             child: Padding(
               padding: EdgeInsets.fromLTRB(40, 0, 40, bottomSpacing),
-              child: Image.asset(
-                RazgovorkoImages.illustration1,
+              child: Center(
+                child: Image.asset(
+                  RazgovorkoImages.illustration1,
+                ),
               ),
             ),
           ),
+
+          const SizedBox(height: 24),
 
           ///
           /// CONTENT

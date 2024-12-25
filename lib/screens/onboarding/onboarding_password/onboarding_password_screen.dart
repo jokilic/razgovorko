@@ -74,11 +74,15 @@ class _OnboardingPasswordScreenState extends State<OnboardingPasswordScreen> {
           Expanded(
             child: Padding(
               padding: EdgeInsets.fromLTRB(40, 0, 40, bottomSpacing),
-              child: Image.asset(
-                RazgovorkoImages.illustration4,
+              child: Center(
+                child: Image.asset(
+                  RazgovorkoImages.illustration4,
+                ),
               ),
             ),
           ),
+
+          const SizedBox(height: 24),
 
           ///
           /// CONTENT
