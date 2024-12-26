@@ -101,12 +101,12 @@ class _LoginScreenState extends State<LoginNumberScreen> with SingleTickerProvid
                 ),
                 const SizedBox(height: 4),
                 OnboardingTextField(
-                  autofocus: true,
                   onChanged: (newNumber) => controller.updateState(
                     newNumber: newNumber,
                   ),
                   keyboardType: TextInputType.phone,
                   textInputAction: TextInputAction.done,
+                  labelText: 'Type your number...',
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
                   ],

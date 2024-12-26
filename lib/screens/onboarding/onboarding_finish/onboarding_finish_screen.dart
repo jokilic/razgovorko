@@ -354,7 +354,7 @@ class _OnboardingFinishScreenState extends State<OnboardingFinishScreen> with Si
                         buttonText: 'Register',
                         isActive: true,
                         onPressed: () async {
-                          final isRegistered = await controller.registerUser(
+                          final user = await controller.registerUser(
                             displayName: widget.name,
                             parsedNumber: widget.parsedNumber,
                             password: widget.password,
@@ -365,7 +365,9 @@ class _OnboardingFinishScreenState extends State<OnboardingFinishScreen> with Si
                             dateOfBirth: widget.dateOfBirth,
                           );
 
-                          if (!isRegistered) {
+                          if (user != null) {
+                            openChat(context);
+                          } else {
                             buttonShakeAnimationController.reset();
                             await buttonShakeAnimationController.forward();
                           }

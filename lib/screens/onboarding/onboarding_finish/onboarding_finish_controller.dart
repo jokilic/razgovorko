@@ -47,7 +47,7 @@ class OnboardingFinishController {
   //   }
   // }
 
-  Future<bool> registerUser({
+  Future<User?> registerUser({
     required ParsedNumber parsedNumber,
     required String password,
     required String displayName,
@@ -80,15 +80,15 @@ class OnboardingFinishController {
 
       if (razgovorkoUser != null) {
         logger.t('OnboardingFinishController -> registerUser() -> razgovorkoUser -> success!');
-        return true;
+        return supabaseUser;
       } else {
         logger.e('OnboardingFinishController -> registerUser() -> razgovorkoUser == null');
+        return null;
       }
     } else {
       logger.e('OnboardingFinishController -> registerUser() -> supabaseUser == null');
+      return null;
     }
-
-    return false;
   }
 
   /// Registers `user` with `email` in [Supabase]
