@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../../../services/logger_service.dart';
@@ -31,6 +32,7 @@ class OnboardingAdditionalController extends ValueNotifier<
   ///
 
   final dateController = TextEditingController();
+  final imagePicker = ImagePicker();
 
   ///
   /// DISPOSE
@@ -122,5 +124,24 @@ class OnboardingAdditionalController extends ValueNotifier<
     dateController.text = formattedDate;
 
     updateState(dateOfBirth: newDate);
+  }
+
+  Future<void> pickImage() async {
+    final image = await imagePicker.pickImage(
+      source: ImageSource.gallery,
+      maxHeight: 1080,
+      maxWidth: 1080,
+      imageQuality: 60,
+    );
+
+    if (image != null) {
+      updateState(
+        avatarUrl: image.path,
+      );
+
+      logger.f('New image -> ${image.path}');
+    } else {
+      logger.e('Image not picked');
+    }
   }
 }

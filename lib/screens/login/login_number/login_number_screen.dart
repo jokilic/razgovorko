@@ -105,7 +105,6 @@ class _LoginScreenState extends State<LoginNumberScreen> with SingleTickerProvid
                   ),
                   keyboardType: TextInputType.phone,
                   textInputAction: TextInputAction.done,
-                  labelText: 'Add your number...',
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
                   ],

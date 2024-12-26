@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:watch_it/watch_it.dart';
 
+import '../../../constants/icons.dart';
 import '../../../dependencies.dart';
 import '../../../models/parsed_number.dart';
 import '../../../routing.dart';
@@ -102,9 +105,33 @@ class _OnboardingAdditionalScreenState extends State<OnboardingAdditionalScreen>
                   style: context.textStyles.onboardingText,
                 ),
                 const SizedBox(height: 16),
-                Placeholder(
-                  fallbackHeight: 240,
-                  color: context.colors.blue,
+                RazgovorkoButton(
+                  onPressed: controller.pickImage,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      border: additionalState.avatarUrl == null
+                          ? Border.all(
+                              color: context.colors.black,
+                              width: 2.5,
+                            )
+                          : null,
+                    ),
+                    height: 240,
+                    width: double.infinity,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(24),
+                      child: additionalState.avatarUrl != null
+                          ? Image.file(
+                              File(additionalState.avatarUrl!),
+                              fit: BoxFit.cover,
+                            )
+                          : Image.asset(
+                              RazgovorkoIcons.profilePicture,
+                              fit: BoxFit.cover,
+                            ),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 32),
                 Text(
@@ -146,8 +173,6 @@ class _OnboardingAdditionalScreenState extends State<OnboardingAdditionalScreen>
                   onChanged: (value) => controller.updateState(
                     location: value,
                   ),
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.next,
                   labelText: 'Type where are you...',
                 ),
                 const SizedBox(height: 32),

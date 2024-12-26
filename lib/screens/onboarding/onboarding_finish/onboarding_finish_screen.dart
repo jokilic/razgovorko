@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
@@ -301,6 +303,38 @@ class _OnboardingFinishScreenState extends State<OnboardingFinishScreen> with Si
                                   fontWeight: FontWeight.w500,
                                   letterSpacing: 1.4,
                                   color: context.colors.black,
+                                ),
+                              ),
+                            ],
+
+                            ///
+                            /// PROFILE PICTURE
+                            ///
+                            if (widget.avatarUrl != null) ...[
+                              const SizedBox(height: 24),
+                              Text(
+                                'Profile picture'.toUpperCase(),
+                                style: TextStyle(
+                                  fontFamily: 'Kanit',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.8,
+                                  color: context.colors.black.withOpacity(0.4),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                                height: 160,
+                                width: double.infinity,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: Image.file(
+                                    File(widget.avatarUrl!),
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                             ],

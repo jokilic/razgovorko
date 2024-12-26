@@ -5,6 +5,7 @@ import '../../../constants/borders.dart';
 import '../../../theme/theme.dart';
 
 class OnboardingTextField extends StatelessWidget {
+  final FocusNode? focusNode;
   final TextEditingController? controller;
   final bool readOnly;
   final bool autofocus;
@@ -12,17 +13,18 @@ class OnboardingTextField extends StatelessWidget {
   final Function(String value)? onChanged;
   final Function()? onTap;
   final List<TextInputFormatter>? inputFormatters;
-  final TextInputType keyboardType;
-  final TextInputAction textInputAction;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
   final Widget? prefix;
-  final String labelText;
+  final String? labelText;
   final int? maxLines;
   final TextCapitalization textCapitalization;
 
   const OnboardingTextField({
-    required this.keyboardType,
-    required this.textInputAction,
-    required this.labelText,
+    this.focusNode,
+    this.keyboardType = TextInputType.text,
+    this.textInputAction = TextInputAction.next,
+    this.labelText,
     this.controller,
     this.onChanged,
     this.onTap,
@@ -37,6 +39,7 @@ class OnboardingTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => TextField(
+        focusNode: focusNode,
         readOnly: readOnly,
         controller: controller,
         maxLines: maxLines,
@@ -56,6 +59,7 @@ class OnboardingTextField extends StatelessWidget {
         decoration: InputDecoration(
           prefix: prefix,
           isCollapsed: true,
+          isDense: false,
           contentPadding: const EdgeInsets.symmetric(vertical: 8),
           alignLabelWithHint: true,
           labelStyle: context.textStyles.onboardingTextFieldLabel,

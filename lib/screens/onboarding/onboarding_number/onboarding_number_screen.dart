@@ -122,12 +122,12 @@ class _OnboardingNumberScreenState extends State<OnboardingNumberScreen> with Si
                 ),
                 const SizedBox(height: 4),
                 OnboardingTextField(
+                  autofocus: true,
                   onChanged: (newNumber) => controller.updateState(
                     newNumber: newNumber,
                   ),
                   keyboardType: TextInputType.phone,
                   textInputAction: TextInputAction.done,
-                  labelText: 'Add your number...',
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
                   ],
