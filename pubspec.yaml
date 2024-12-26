@@ -12,6 +12,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
+  confetti: 0.8.0
   country_code_picker_plus: 0.0.9
   fast_contacts: 4.0.0
   flutter_animate: 4.5.2
