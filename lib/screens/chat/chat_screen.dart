@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../../constants/images.dart';
 import '../../dependencies.dart';
-import '../../models/chat.dart';
-import '../../routing.dart';
 import '../../services/auth_service.dart';
 import '../../services/chat_user_status_table_service.dart';
 import '../../services/chats_table_service.dart';
