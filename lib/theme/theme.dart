@@ -13,9 +13,9 @@ class RazgovorkoTheme {
 
     return defaultTheme.copyWith(
       textSelectionTheme: TextSelectionThemeData(
-        cursorColor: lightAppColors.blue,
-        selectionColor: lightAppColors.blue,
-        selectionHandleColor: lightAppColors.blue,
+        cursorColor: lightAppColors.cyan,
+        selectionColor: lightAppColors.cyan,
+        selectionHandleColor: lightAppColors.cyan,
       ),
       scaffoldBackgroundColor: lightAppColors.white,
       extensions: [
@@ -28,7 +28,6 @@ class RazgovorkoTheme {
   static final lightAppColors = RazgovorkoColorsExtension(
     white: RazgovorkoColors.white,
     black: RazgovorkoColors.black,
-    blue: RazgovorkoColors.blue,
     cyan: RazgovorkoColors.cyan,
   );
 

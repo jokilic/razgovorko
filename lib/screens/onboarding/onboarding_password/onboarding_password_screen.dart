@@ -8,6 +8,7 @@ import '../../../routing.dart';
 import '../../../services/logger_service.dart';
 import '../../../theme/theme.dart';
 import '../../../widgets/razgovorko_button.dart';
+import '../widgets/onboarding_button.dart';
 import '../widgets/onboarding_text_field.dart';
 import 'onboarding_password_controller.dart';
 
@@ -115,35 +116,14 @@ class _OnboardingPasswordScreenState extends State<OnboardingPasswordScreen> {
                   labelText: 'Type your password...',
                 ),
                 const SizedBox(height: 40),
-                RazgovorkoButton(
-                  onPressed: isStateProper
-                      ? () => openOnboardingAdditional(
-                            context,
-                            name: widget.name,
-                            parsedNumber: widget.parsedNumber,
-                            password: passwordState!,
-                          )
-                      : null,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 24,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(32),
-                      border: Border.all(
-                        width: 2.5,
-                        color: context.colors.blue.withOpacity(isStateProper ? 1 : 0.25),
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Continue',
-                      style: context.textStyles.onboardingButton.copyWith(
-                        color: context.colors.black.withOpacity(isStateProper ? 1 : 0.25),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                OnboardingButton(
+                  buttonText: 'Next',
+                  isActive: isStateProper,
+                  onPressed: () => openOnboardingAdditional(
+                    context,
+                    name: widget.name,
+                    parsedNumber: widget.parsedNumber,
+                    password: passwordState!,
                   ),
                 ),
                 const SizedBox(height: 24),

@@ -10,6 +10,7 @@ import '../../../services/auth_service.dart';
 import '../../../services/logger_service.dart';
 import '../../../theme/theme.dart';
 import '../../../widgets/razgovorko_button.dart';
+import '../../onboarding/widgets/onboarding_button.dart';
 import '../../onboarding/widgets/onboarding_text_field.dart';
 import 'login_password_controller.dart';
 
@@ -116,43 +117,22 @@ class _LoginPasswordScreenState extends State<LoginPasswordScreen> with SingleTi
                   ],
                   autoPlay: false,
                   controller: buttonShakeAnimationController,
-                  child: RazgovorkoButton(
-                    onPressed: isStateProper
-                        ? () async {
-                            final user = await controller.signIn(
-                              email: '${widget.parsedNumber.international.replaceAll(' ', '')}@razgovorko.com',
-                              password: passwordState!.trim(),
-                            );
+                  child: OnboardingButton(
+                    buttonText: 'Login',
+                    isActive: isStateProper,
+                    onPressed: () async {
+                      final user = await controller.signIn(
+                        email: '${widget.parsedNumber.international.replaceAll(' ', '')}@razgovorko.com',
+                        password: passwordState!.trim(),
+                      );
 
-                            if (user != null) {
-                              openChat(context);
-                            } else {
-                              buttonShakeAnimationController.reset();
-                              await buttonShakeAnimationController.forward();
-                            }
-                          }
-                        : null,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 24,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(32),
-                        border: Border.all(
-                          width: 2.5,
-                          color: context.colors.blue.withOpacity(isStateProper ? 1 : 0.25),
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        'Login',
-                        style: context.textStyles.onboardingButton.copyWith(
-                          color: context.colors.black.withOpacity(isStateProper ? 1 : 0.25),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
+                      if (user != null) {
+                        openChat(context);
+                      } else {
+                        buttonShakeAnimationController.reset();
+                        await buttonShakeAnimationController.forward();
+                      }
+                    },
                   ),
                 ),
                 const SizedBox(height: 24),

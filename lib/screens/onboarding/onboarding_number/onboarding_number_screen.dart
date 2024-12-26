@@ -12,6 +12,7 @@ import '../../../services/logger_service.dart';
 import '../../../services/users_table_service.dart';
 import '../../../theme/theme.dart';
 import '../../../widgets/razgovorko_button.dart';
+import '../widgets/onboarding_button.dart';
 import '../widgets/onboarding_text_field.dart';
 import 'onboarding_number_controller.dart';
 
@@ -195,55 +196,34 @@ class _OnboardingNumberScreenState extends State<OnboardingNumberScreen> with Si
                   ],
                   autoPlay: false,
                   controller: buttonShakeAnimationController,
-                  child: RazgovorkoButton(
-                    onPressed: isStateProper
-                        ? () async {
-                            /// Try to parse number
-                            final parsedNumber = await controller.getParsedNumberFromState();
+                  child: OnboardingButton(
+                    buttonText: 'Continue',
+                    isActive: isStateProper,
+                    onPressed: () async {
+                      /// Try to parse number
+                      final parsedNumber = await controller.getParsedNumberFromState();
 
-                            /// Number is proper, check if user exists
-                            if (parsedNumber != null) {
-                              final userExists = await controller.getUserExistsInDatabase(
-                                parsedNumber: parsedNumber,
-                              );
+                      /// Number is proper, check if user exists
+                      if (parsedNumber != null) {
+                        final userExists = await controller.getUserExistsInDatabase(
+                          parsedNumber: parsedNumber,
+                        );
 
-                              if (!userExists) {
-                                openOnboardingPassword(
-                                  context,
-                                  name: widget.name,
-                                  parsedNumber: parsedNumber,
-                                );
-                              } else {
-                                buttonShakeAnimationController.reset();
-                                await buttonShakeAnimationController.forward();
-                              }
-                            } else {
-                              buttonShakeAnimationController.reset();
-                              await buttonShakeAnimationController.forward();
-                            }
-                          }
-                        : null,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 24,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(32),
-                        border: Border.all(
-                          width: 2.5,
-                          color: context.colors.blue.withOpacity(isStateProper ? 1 : 0.25),
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        'Continue',
-                        style: context.textStyles.onboardingButton.copyWith(
-                          color: context.colors.black.withOpacity(isStateProper ? 1 : 0.25),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
+                        if (!userExists) {
+                          openOnboardingPassword(
+                            context,
+                            name: widget.name,
+                            parsedNumber: parsedNumber,
+                          );
+                        } else {
+                          buttonShakeAnimationController.reset();
+                          await buttonShakeAnimationController.forward();
+                        }
+                      } else {
+                        buttonShakeAnimationController.reset();
+                        await buttonShakeAnimationController.forward();
+                      }
+                    },
                   ),
                 ),
                 const SizedBox(height: 24),

@@ -10,6 +10,7 @@ import '../../../routing.dart';
 import '../../../services/logger_service.dart';
 import '../../../theme/theme.dart';
 import '../../../widgets/razgovorko_button.dart';
+import '../widgets/onboarding_button.dart';
 import '../widgets/onboarding_text_field.dart';
 import 'onboarding_additional_controller.dart';
 
@@ -205,7 +206,9 @@ class _OnboardingAdditionalScreenState extends State<OnboardingAdditionalScreen>
                   labelText: 'Add your date of birth...',
                 ),
                 const SizedBox(height: 40),
-                RazgovorkoButton(
+                OnboardingButton(
+                  buttonText: 'Confirm',
+                  isActive: true,
                   onPressed: () => openOnboardingFinish(
                     context,
                     name: widget.name,
@@ -216,25 +219,6 @@ class _OnboardingAdditionalScreenState extends State<OnboardingAdditionalScreen>
                     status: (additionalState.status?.isNotEmpty ?? false) ? additionalState.status : null,
                     location: (additionalState.location?.isNotEmpty ?? false) ? additionalState.location : null,
                     dateOfBirth: additionalState.dateOfBirth,
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 24,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(32),
-                      border: Border.all(
-                        width: 2.5,
-                        color: context.colors.blue,
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Confirm',
-                      style: context.textStyles.onboardingButton,
-                      textAlign: TextAlign.center,
-                    ),
                   ),
                 ),
                 const SizedBox(height: 24),

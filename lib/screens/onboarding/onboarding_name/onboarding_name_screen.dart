@@ -7,6 +7,7 @@ import '../../../routing.dart';
 import '../../../services/logger_service.dart';
 import '../../../theme/theme.dart';
 import '../../../widgets/razgovorko_button.dart';
+import '../widgets/onboarding_button.dart';
 import '../widgets/onboarding_text_field.dart';
 import 'onboarding_name_controller.dart';
 
@@ -111,33 +112,12 @@ class _OnboardingNameScreenState extends State<OnboardingNameScreen> {
                   labelText: 'Type your name...',
                 ),
                 const SizedBox(height: 40),
-                RazgovorkoButton(
-                  onPressed: (nameState?.trim().isNotEmpty ?? false)
-                      ? () => openOnboardingNumber(
-                            context,
-                            name: nameState!.trim(),
-                          )
-                      : null,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 24,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(32),
-                      border: Border.all(
-                        width: 2.5,
-                        color: context.colors.blue.withOpacity((nameState?.isNotEmpty ?? false) ? 1 : 0.25),
-                      ),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Get started',
-                      style: context.textStyles.onboardingButton.copyWith(
-                        color: context.colors.black.withOpacity((nameState?.isNotEmpty ?? false) ? 1 : 0.25),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                OnboardingButton(
+                  buttonText: 'Get started',
+                  isActive: nameState?.trim().isNotEmpty ?? false,
+                  onPressed: () => openOnboardingNumber(
+                    context,
+                    name: nameState!.trim(),
                   ),
                 ),
                 const SizedBox(height: 24),
