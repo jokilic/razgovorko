@@ -108,6 +108,7 @@ class _LoginPasswordScreenState extends State<LoginPasswordScreen> with SingleTi
                   onChanged: (newPassword) => controller.value = newPassword,
                   keyboardType: TextInputType.visiblePassword,
                   textInputAction: TextInputAction.done,
+                  textCapitalization: TextCapitalization.none,
                   labelText: 'Type your password...',
                 ),
                 const SizedBox(height: 40),
